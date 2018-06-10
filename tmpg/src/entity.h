@@ -7,7 +7,7 @@ namespace tmpg {
 
 	enum movement_t
 	{
-		FORWARD, BACKWARD, LEFT, RIGHT, JUMP, RUN
+		FORWARD, BACKWARD, LEFT, RIGHT, JUMP, DOWN, RUN
 	};
 
 	enum state_t

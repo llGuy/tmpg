@@ -6,6 +6,7 @@
 #include "input_handler.h"
 #include "renderer_3D.h"
 #include "layer_3D.h"
+#include "platform.h"
 #include "program.h"
 #include "configs.h"
 #include "window.h"
@@ -34,6 +35,7 @@ namespace tmpg {
 	private:
 		// render
 		void RenderEntities(void);
+		void RenderPlatforms(void);
 		void CheckMouseUpdates(void);
 		void CheckKeyboardUpdates(void);
 	private:
@@ -43,6 +45,9 @@ namespace tmpg {
 		InputHandler m_inputHandler;
 		physics::PhysicsHandler m_physicsHandler;
 		EntitiesHandler m_entitiesHandler;
+
+		// early stage of game, only 1 platform
+		Platform m_platform;
 	};
 
 }

@@ -21,7 +21,8 @@ namespace tmpg {
 		case BACKWARD: finalDirection = -(glm::normalize(glm::vec3(m_direction.x, 0.0f, m_direction.z))); break;
 		case RIGHT: finalDirection = glm::cross(m_direction, UP); break;
 		case LEFT: finalDirection = -glm::cross(m_direction, UP); break;
-		case JUMP: finalDirection = UP;
+		case JUMP: finalDirection = UP; break;
+		case DOWN: finalDirection = -UP;
 		}
 
 		m_position += finalDirection * m_speed * time;

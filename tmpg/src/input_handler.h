@@ -6,7 +6,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#define MAX_KEYS 100
+#define MAX_KEYS 350
 #define MAX_MOUSE_BUTTONS 5
 
 namespace tmpg {

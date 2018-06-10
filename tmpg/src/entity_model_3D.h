@@ -14,6 +14,12 @@ namespace tmpg {
 		void GenerateData(void) override;
 		// element array buffer? array buffer?
 		GLenum BindingPoint(void) override;
+
+		// doesn't store the vertices
+		glm::vec3* Vertex(uint32_t index) override
+		{
+			return nullptr;
+		}
 	public:
 		const ::gl::VertexArray& ModelVAO(void) const override
 		{

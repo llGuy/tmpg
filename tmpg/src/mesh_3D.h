@@ -1,6 +1,8 @@
 #ifndef	_MESH_3D_H_
 #define _MESH_3D_H_
 
+#include <array>
+
 #include "renderable_3D.h"
 
 namespace tmpg {
@@ -13,7 +15,7 @@ namespace tmpg {
 		static constexpr uint32_t VERTX = _Dmx;
 		static constexpr uint32_t VERTZ = _Dmz;
 	public:
-		Mesh(void)
+		Mesh3D(void)
 		{
 		}
 		void GenerateData(void) override
@@ -32,80 +34,36 @@ namespace tmpg {
 
 		uint32_t Count(void) override
 		{
-			static constexpr COUNT = (VERTX - 1) * (VERTZ - 1) * 6;
+			static constexpr uint32_t COUNT = (VERTX - 1) * (VERTZ - 1) * 6;
 			return COUNT;
 		}
 
 		uint32_t Offset(void) override
 		{
-			return m_vertices.size();
+			return m_vertices.size() * sizeof(glm::vec3);
 		}
 
-		inline
-			VAO& VertexArray(void)
+		glm::vec3* Vertex(uint32_t index) override
 		{
-			return m_vao;
-		}
-		// get x and z coord of player to return the height
-		float HeightAtPoint(float x, float z)
-		{
-			float dmxf = static_cast<float>(VERTX) / 2.0f - 1.0f;
-			float dmzf = static_cast<float>(VERTZ) / 2.0f - 1.0f;
-
-			if (x > dmxf || x < -dmxf || z > dmzf || z < -dmzf) return -200.0f;
-			float height = 0.0f;
-			// get the difference between the tile corner and
-			// the actual coordinate
-			glm::vec2 positionOnTile(x - floor(x), z - floor(z));
-			// indices of the triangle of the tile that the position
-			// is pointing to
-			uint16_t triangleIndices[3];
-
-			// calculate the neg-x neg-z coord of tile
-			glm::vec2 tilenegxz(floor(x) + static_cast<float>(VERTX) / 2.0f,
-				floor(z) + static_cast<float>(VERTZ) / 2.0f);
-
-			auto getheight = [&](const glm::vec2& c2, const glm::vec2& c3) -> float
-			{
-				triangleIndices[0] = VIndexf(tilenegxz.x, tilenegxz.y);
-				triangleIndices[1] = VIndexf(tilenegxz.x + c2.x, tilenegxz.y + c2.y);
-				triangleIndices[2] = VIndexf(tilenegxz.x + c3.x, tilenegxz.y + c3.y);
-
-				glm::vec3 coord1(0.0f, m_vertices[triangleIndices[0]].y, 0.0f);
-				glm::vec3 coord2(c2.x, m_vertices[triangleIndices[1]].y, c2.y);
-				glm::vec3 coord3(c3.x, m_vertices[triangleIndices[2]].y, c3.y);
-				return BarryCentric(coord1, coord2, coord3, glm::vec2(positionOnTile.x, positionOnTile.y));
-			};
-
-			if (positionOnTile.y <= positionOnTile.x) height = getheight(glm::vec2(1.0f, 0.0f), glm::vec2(1.0f, 1.0f));
-			else height = getheight(glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f));
-
-			return height;
-		}
-		glm::ivec2 WorldtoMeshSpace(const glm::vec2& pos)
-		{
-			glm::vec2 fpos = pos + glm::vec2(static_cast<float>(VERTX) / 2.0f, static_cast<float>(VERTZ) / 2.0f);
-			return glm::ivec2(static_cast<uint32_t>(fpos.x), static_cast<uint32_t>(fpos.y));
-		}
-
-		std::optional<glm::vec3*> At(uint32_t x, uint32_t z)
-		{
-			if (x > _Dmx - 1 || z > _Dmz - 1) return std::optional<glm::vec3*>();
-
-			uint32_t index = VIndex(x, z);
 			return &m_vertices[index];
+		}
+
+		void Update(void) override
+		{
+			UpdateVertexBuffer();
 		}
 
 		void UpdateVertexBuffer(void)
 		{
 			const uint32_t VERTICES_SIZE_BYTES = sizeof(glm::vec3) * m_vertices.size();
-			m_vibuffer.PartialFill(0, VERTICES_SIZE_BYTES, m_vertices.data(), GL_ARRAY_BUFFER);
+			m_buffer.PartialFill(0, VERTICES_SIZE_BYTES, m_vertices.data(), GL_ARRAY_BUFFER);
 		}
 	private:
 		uint32_t VIndex(uint32_t x, uint32_t z)
 		{
 			return x + VERTX * z;
 		}
+
 		uint32_t VIndexf(float x, float z)
 		{
 			return static_cast<uint32_t>(x) + VERTX * static_cast<uint32_t>(z);
@@ -165,7 +123,7 @@ namespace tmpg {
 		void CreateVAO(void)
 		{
 			m_vao.Bind();
-			m_vibuffer.Bind(GL_ARRAY_BUFFER);
+			m_buffer.Bind(GL_ARRAY_BUFFER);
 			m_vao.Enable(0);
 			m_vao.VAPtr(0, 3, GL_FLOAT, 3 * sizeof(float), nullptr);
 		}

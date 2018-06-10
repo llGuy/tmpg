@@ -1,6 +1,8 @@
 #ifndef _RENDERABLE_3D_H_
 #define _RENDERABLE_3D_H_
 
+#include <glm/glm.hpp>
+
 #include "vao.h"
 #include "buffer.h"
 
@@ -26,6 +28,7 @@ namespace tmpg {
 		virtual void Update(void) 
 		{
 		}
+		virtual glm::vec3* Vertex(uint32_t index) = 0;
 	public:
 		virtual const ::gl::VertexArray& ModelVAO(void) const
 		{

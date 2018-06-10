@@ -16,7 +16,7 @@ namespace tmpg {
 
 	void InputHandler::HandleKeyInput(GLFWwindow* win, int key, int scancode, int action, int mods)
 	{
-		if (key < 100)
+		if (key < MAX_KEYS)
 		{
 			InputHandler* inputHandler = (InputHandler*)glfwGetWindowUserPointer(win);
 			if (action == GLFW_PRESS) inputHandler->m_keyMap[key] = true;

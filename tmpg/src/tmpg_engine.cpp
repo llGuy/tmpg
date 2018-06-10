@@ -11,6 +11,7 @@ namespace tmpg {
 	void TMPGEng::InitData(void)
 	{
 		InitEntities();
+		m_platform.Generate();
 		InitLayers();
 		Configure();
 	}
@@ -22,6 +23,7 @@ namespace tmpg {
 
 		glEnable(GL_DEPTH_TEST);
 		RenderEntities();
+		RenderPlatforms();
 	}
 
 	void TMPGEng::UpdateWin(void)
@@ -62,6 +64,7 @@ namespace tmpg {
 		if (m_inputHandler.Key(GLFW_KEY_S)) entityBoundByCamera.Move(BACKWARD, TIME);
 		if (m_inputHandler.Key(GLFW_KEY_D)) entityBoundByCamera.Move(RIGHT, TIME);
 		if (m_inputHandler.Key(GLFW_KEY_SPACE)) entityBoundByCamera.Move(JUMP, TIME);
+		if (m_inputHandler.Key(GLFW_KEY_LEFT_SHIFT)) entityBoundByCamera.Move(DOWN, TIME);
 	}
 
 	void TMPGEng::InitWin(void)
@@ -82,7 +85,7 @@ namespace tmpg {
 	{
 		m_entitiesHandler.Init();
 		m_entitiesHandler.PushEntity(glm::vec3(0.01f, 0.0f, 2.0f),
-									 glm::vec3(0.01f, 0.01f, -1.0f));
+									 glm::vec3(1.0f, 0.01f, 1.0f));
 		m_entitiesHandler.PushEntity(glm::vec3(0.0f, 0.0f, 0.0f),
 									 glm::vec3(0.01f, 0.01f, -1.0f));
 
@@ -96,7 +99,8 @@ namespace tmpg {
 	{
 		// prepare scene layer with the entity's model
 		m_sceneLayer.PushObject(m_entitiesHandler.Model3D());
-		m_sceneLayer.BindRenderer(0);
+		m_sceneLayer.PushObject(m_platform.Mesh());
+
 		decltype(auto) program = m_sceneLayer.ShaderProgram();
 		program.CreateShader(GL_VERTEX_SHADER, ::gl::Program::ShaderPath("scene/vsh.shader"));
 		program.CreateShader(GL_GEOMETRY_SHADER, ::gl::Program::ShaderPath("scene/gsh.shader"));
@@ -112,6 +116,9 @@ namespace tmpg {
 	
 	void TMPGEng::RenderEntities(void)
 	{
+		// bind to entity model
+		m_sceneLayer.BindRenderer(0);
+
 		decltype(auto) program = m_sceneLayer.ShaderProgram();
 		program.UseProgram();
 		glm::mat4& view = m_entitiesHandler.CameraViewMatrix();
@@ -135,6 +142,29 @@ namespace tmpg {
 				m_sceneLayer.Render(GL_TRIANGLES);
 			}
 		}
+	}
+
+	void TMPGEng::RenderPlatforms(void)
+	{
+		// bind to platform
+		m_sceneLayer.BindRenderer(1);
+
+		decltype(auto) program = m_sceneLayer.ShaderProgram();
+		program.UseProgram();
+		decltype(auto) view = m_entitiesHandler.CameraViewMatrix();
+		decltype(auto) projection = m_sceneLayer.ProjectionMatrix();
+		decltype(auto) sunPosition = m_physicsHandler.SunPosition();
+
+		glm::vec3 modelColor(0.8f, 0.4f, 0.0f);
+		glm::mat4 translation(1.0f);
+
+		program.Uniform3f(&modelColor[0], 0);
+		program.UniformMat4(&translation[0][0], 1);
+		program.UniformMat4(&view[0][0], 2);
+		program.UniformMat4(&projection[0][0], 3);
+		program.Uniform3f(&sunPosition[0], 4);
+
+		m_sceneLayer.Render(GL_TRIANGLES);
 	}
 
 }
