@@ -3,7 +3,7 @@
 namespace tmpg {
 
 	Entity::Entity(const glm::vec3& p, const glm::vec3& d, uint32_t id)
-		: m_position(p), m_direction(d), m_id(id), m_speed(0.2f), m_height(0.5f)
+		: m_position(p), m_direction(d), m_id(id), m_speed(0.2f), m_height(0.5f), m_terraforming(-1)
 	{
 	}
 
@@ -46,6 +46,16 @@ namespace tmpg {
 	uint32_t Entity::ID(void)
 	{
 		return m_id;
+	}
+
+	int32_t& Entity::Terraforming(void)
+	{
+		return m_terraforming;
+	}
+
+	float Entity::Height(void)
+	{
+		return m_height;
 	}
 
 }

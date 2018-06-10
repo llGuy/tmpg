@@ -137,6 +137,7 @@
     <ClCompile Include="src\physics_handler.cpp" />
     <ClCompile Include="src\platform.cpp" />
     <ClCompile Include="src\program.cpp" />
+    <ClCompile Include="src\ray.cpp" />
     <ClCompile Include="src\renderer_3D.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\tmpg_engine.cpp" />
@@ -154,11 +155,14 @@
     <ClInclude Include="src\mesh_3D.h" />
     <ClInclude Include="src\physics_handler.h" />
     <ClInclude Include="src\platform.h" />
+    <ClInclude Include="src\platform_mound.h" />
     <ClInclude Include="src\program.h" />
+    <ClInclude Include="src\ray.h" />
     <ClInclude Include="src\renderable_3D.h" />
     <ClInclude Include="src\renderer_3D.h" />
     <ClInclude Include="src\shader.h" />
     <ClInclude Include="src\tmpg_engine.h" />
+    <ClInclude Include="src\utils.h" />
     <ClInclude Include="src\vao.h" />
     <ClInclude Include="src\window.h" />
   </ItemGroup>

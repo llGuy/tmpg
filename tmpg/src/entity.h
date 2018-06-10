@@ -27,8 +27,10 @@ namespace tmpg {
 		void Move(movement_t m, float time);
 
 		glm::vec3 EyePosition(void) const;
-		glm::vec3& Position(void);
+		int32_t& Terraforming(void);
 		glm::vec3& Direction(void);
+		glm::vec3& Position(void);
+		float Height(void);
 		uint32_t ID(void);
 	private:
 		static constexpr glm::vec3 UP { 0.0f, 1.0f, 0.0f };
@@ -38,6 +40,7 @@ namespace tmpg {
 		float m_speed;
 		float m_height;
 		uint32_t m_id;
+		int32_t m_terraforming;
 	};
 
 }

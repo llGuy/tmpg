@@ -36,6 +36,9 @@ namespace tmpg {
 		CheckMouseUpdates();
 		CheckKeyboardUpdates();
 		m_entitiesHandler.UpdateEntities();
+
+#define TIME 0.02f
+		m_platform.UpdateForcePoints(TIME);
 	}
 
 	void TMPGEng::Configure(void)
@@ -52,6 +55,10 @@ namespace tmpg {
 			decltype(auto) cursorPosition = m_inputHandler.CursorPosition();
 			m_entitiesHandler.UpdateCameraDirection(cursorPosition, m_configs.sensitivity);
 		}
+
+		// mouse buttons
+		if (m_inputHandler.MouseButton(GLFW_MOUSE_BUTTON_2)) m_platform.HandleAction(START_TERRAFORMING, m_entitiesHandler.EntityBoundByCamera());
+		else m_platform.HandleAction(END_TERRAFORMING, m_entitiesHandler.EntityBoundByCamera());
 	}
 
 	void TMPGEng::CheckKeyboardUpdates(void)
@@ -77,6 +84,7 @@ namespace tmpg {
 		m_win.UserPointer(&m_inputHandler);
 
 		m_win.KeyCallback(InputHandler::HandleKeyInput);
+		m_win.MouseButtonCallback(InputHandler::HandleMouseInput);
 		m_win.CursorMovementCallback(InputHandler::HandleMouseMovement);
 		m_win.InputMode(GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
