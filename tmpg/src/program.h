@@ -10,34 +10,73 @@
 #include "shader.h"
 
 namespace gl {
-
-	enum udata_t
+	
+	class Program
 	{
-		VEC3,
+	public:
+		Program(void) = default;
 
-		VEC2,
+		void UseProgram(void);
+		void CreateShader(GLenum type, const std::string& dir);
 
-		MAT4,
-
-		F1,
-
-		INV
-	};
-
-	struct UDataLoc
-	{
-		UDataLoc(void) = default;
-		UDataLoc(udata_t t, const char* n)
-			: type(t), name(n)
+		void Uniform1f(float p, uint32_t index);
+		void Uniform2f(float* p, uint32_t index);
+		void Uniform3f(float* p, uint32_t index);
+		void UniformMat4(float* p, uint32_t index);
+	public:
+		template<typename... _Ty>
+		void LinkShaders(_Ty... attribs)
 		{
+			bool success = true;
+			for (auto& shader : m_shaders) success &= shader.Status();
+			if (success)
+			{
+				m_programID = glCreateProgram();
+				AttachShaders();
+				BindAttribs(attribs...);
+				glLinkProgram(m_programID);
+				DeleteShaders();
+			}
+			// check program status
+			Status();
 		}
-		udata_t type;
-		const char* name;
-		uint32_t location;
+		template<typename... _Ty>
+		void GetUniformLocations(_Ty... locs)
+		{
+			std::array<const char*, sizeof...(locs)> names { locs... };
+			std::for_each(names.begin(), names.end(), [&](const char* name)
+			{
+				uint32_t location = glGetUniformLocation(m_programID, name);
+				m_uniformLocations.push_back(location);
+			});
+		}
+	private:
+		bool Status(void);
+		void AttachShaders();
+		void DeleteShaders(void);
+
+		template<typename... _Ty>
+		void BindAttribs(_Ty... attribs)
+		{
+			std::array<const char*, sizeof...(attribs)> atts{ attribs... };
+			for (uint32_t i = 0; i < sizeof...(attribs); ++i) glBindAttribLocation(m_programID, i, atts[i]);
+		}
+	public:
+		static std::string ShaderPath(const std::string& sub)
+		{
+#ifdef _WIN32
+			return "res/" + sub;
+#else
+			return "../res/" + sub;
+#endif
+		}
+	private:
+		std::vector<uint32_t> m_uniformLocations;
+		std::vector<Shader> m_shaders;
+		uint32_t m_programID;
 	};
 
-
-	template<uint32_t _Size, uint32_t _Locs>
+	/*template<uint32_t _Size, uint32_t _Locs>
 	class Program
 	{
 	public:
@@ -189,7 +228,8 @@ namespace gl {
 		std::array<Shader, _Size> m_shaders;
 		std::array<UDataLoc, _Locs> m_udataLocations;
 		uint32_t m_programID;
-	};
+	};*/
+
 
 }
 

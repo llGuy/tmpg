@@ -18,6 +18,10 @@ namespace gl {
 		~Shader(void) = default;
 
 		void Compile(const std::string& directory);
+		bool Status(void);
+		void Delete(void);
+	private:
+		void AttachShaders(void);
 	public:
 		uint32_t ShaderID(void);
 		GLenum Type(void) const;

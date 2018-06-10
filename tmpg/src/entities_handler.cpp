@@ -3,17 +3,20 @@
 namespace tmpg {
 
 	EntitiesHandler::EntitiesHandler(void)
-		: m_entity3DModel(0.5f),
-		m_entitiesProgram { GL_VERTEX_SHADER,
-	                        GL_GEOMETRY_SHADER,
-							GL_FRAGMENT_SHADER }
 	{
 	}
 
 	void EntitiesHandler::Init(void)
 	{
-		m_entity3DModel.GenerateData();
-		InitShaders();
+		m_entity3DModel = new EntityModel3D(0.5f);
+		m_entity3DModel->GenerateData();
+	}
+
+	void EntitiesHandler::UpdateEntities(void)
+	{
+		std::for_each(m_entities.begin(), m_entities.end(),
+			[](Entity& entity) -> void { entity.Update(); });
+		m_camera.UpdateViewMatrix(EntityBoundByCamera());
 	}
 
 	void EntitiesHandler::BindCamera(uint32_t index)
@@ -31,7 +34,7 @@ namespace tmpg {
 		return m_entities[index];
 	}
 
-	Renderable3D& EntitiesHandler::Model3D(void) 
+	Renderable3D* EntitiesHandler::Model3D(void) 
 	{
 		return m_entity3DModel;
 	}
@@ -41,32 +44,29 @@ namespace tmpg {
 		return m_entities.size();
 	}
 
-	uint32_t EntitiesHandler::EntityBoundByCamera(void) const
+	Entity& EntitiesHandler::EntityBoundByCamera(void)
 	{
-		return m_camera.BoundEntity();
+		return m_entities[m_camera.BoundEntity()];
 	}
 
-	void EntitiesHandler::InitShaders(void)
+	glm::mat4& EntitiesHandler::CameraViewMatrix(void) 
 	{
-		m_entitiesProgram.Compile(
-			::gl::Program<3, 4>::ShaderPath("entity/vsh.shader"),
-			::gl::Program<3, 4>::ShaderPath("entity/gsh.shader"),
-			::gl::Program<3, 4>::ShaderPath("entity/fsh.shader")
-		);
-
-		m_entitiesProgram.Link("vertex_position");
-
-		m_entitiesProgram.GetUniformLocations(
-			::gl::UDataLoc(::gl::udata_t::VEC3, "model_color"),
-			::gl::UDataLoc(::gl::udata_t::MAT4, "matrix_model"),
-			::gl::UDataLoc(::gl::udata_t::MAT4, "matrix_view"),
-			::gl::UDataLoc(::gl::udata_t::MAT4, "matrix_projection")
-		);
+		return m_camera.ViewMatrix();
 	}
 
-	const ::gl::Program<3, 4>& EntitiesHandler::Program(void) const
+	void EntitiesHandler::UpdateCameraDirection(const glm::vec2& cursorPosition, float sens)
 	{
-		return m_entitiesProgram;
+		m_camera.Look(EntityBoundByCamera(), cursorPosition, sens);
+	}
+
+	void EntitiesHandler::UpdateViewMatrix(void)
+	{
+		m_camera.UpdateViewMatrix(EntityBoundByCamera());
+	}
+
+	void EntitiesHandler::UpdateCameraCursorPosition(const glm::vec2& p)
+	{
+		m_camera.UpdateCursorPosition(p);
 	}
 
 }

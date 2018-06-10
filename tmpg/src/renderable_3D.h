@@ -21,6 +21,11 @@ namespace tmpg {
 		virtual GLenum BindingPoint(void) = 0;
 		virtual uint32_t Count(void) = 0;
 		virtual uint32_t Offset(void) = 0;
+
+		// not all classes need this
+		virtual void Update(void) 
+		{
+		}
 	public:
 		virtual const ::gl::VertexArray& ModelVAO(void) const
 		{

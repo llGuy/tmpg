@@ -60,14 +60,19 @@ namespace tmpg {
 		glfwSetInputMode(m_glfwWindow, mode, val);
 	}
 
-	void Window::MouseCallback(MBCallbackFunc cbfun)
+	void Window::MouseButtonCallback(MBCallbackFunc cbfun)
 	{
 		glfwSetMouseButtonCallback(m_glfwWindow, cbfun);
 	}
 
-	void Window::UserPointer(void)
+	void Window::KeyCallback(KeyCallbackFunc func)
 	{
-		glfwSetWindowUserPointer(m_glfwWindow, this);
+		glfwSetKeyCallback(m_glfwWindow, func);
+	}
+
+	void Window::CursorMovementCallback(CursorMovementFunc func)
+	{
+		glfwSetCursorPosCallback(m_glfwWindow, func);
 	}
 
 	bool Window::Open(void) const
@@ -83,6 +88,13 @@ namespace tmpg {
 	int32_t Window::Height(void) const
 	{
 		return m_height;
+	}
+
+	glm::vec2 Window::CursorPosition(void)
+	{
+		double x, y;
+		glfwGetCursorPos(m_glfwWindow, &x, &y);
+		return glm::vec2(static_cast<float>(x), static_cast<float>(y));
 	}
 
 }

@@ -28,8 +28,6 @@ namespace tmpg {
 		glm::vec3 rotateYAx = glm::cross(edir, UP);
 		float yAngle = glm::radians(-cursorPosDiff.y) * sensitivity;
 		edir = glm::mat3(glm::rotate(yAngle, rotateYAx)) * edir;
-
-		m_viewMatrix = glm::lookAt(eye, eye + edir, UP);
 	}
 
 	uint32_t Camera::BoundEntity(void) const
@@ -37,12 +35,12 @@ namespace tmpg {
 		return m_boundID;
 	}
 
-	const glm::mat4& Camera::ViewMatrix(void) const
+	glm::mat4& Camera::ViewMatrix(void) 
 	{
 		return m_viewMatrix;
 	}
 
-	const glm::mat4& Camera::UpdateViewMatrix(Entity& ent)
+	glm::mat4& Camera::UpdateViewMatrix(Entity& ent)
 	{
 		static constexpr glm::vec3 UP = glm::vec3(0.0f, 1.0f, 0.0f);
 		return (m_viewMatrix = glm::lookAt(ent.Position(), ent.Position() + ent.Direction(), UP));

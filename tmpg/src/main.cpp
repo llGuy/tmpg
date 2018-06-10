@@ -11,6 +11,8 @@ int32_t main(int32_t argc, char* argv[])
 	engine.InitWin();
 	GLEWInit();
 
+	engine.InitData();
+
 	while (engine.Running())
 	{
 		engine.UpdateData();

@@ -8,7 +8,7 @@ namespace tmpg {
 	class Renderer3D
 	{
 	public:
-		void Bind(Renderable3D& obj);
+		void Bind(Renderable3D* obj);
 		void RenderElements(GLenum mode);
 	private:
 		Renderable3D* m_bound;

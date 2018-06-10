@@ -17,10 +17,10 @@ namespace tmpg {
 		glm::vec3 finalDirection;
 		switch (m)
 		{
-		case FORWARD: finalDirection = glm::normalize(glm::vec3(m_position.x, 0.0f, m_position.z)); break;
-		case BACKWARD: finalDirection = -(glm::normalize(glm::vec3(m_position.x, 0.0f, m_position.z))); break;
-		case RIGHT: finalDirection = glm::cross(m_position, UP); break;
-		case LEFT: finalDirection = -glm::cross(m_position, UP); break;
+		case FORWARD: finalDirection = glm::normalize(glm::vec3(m_direction.x, 0.0f, m_direction.z)); break;
+		case BACKWARD: finalDirection = -(glm::normalize(glm::vec3(m_direction.x, 0.0f, m_direction.z))); break;
+		case RIGHT: finalDirection = glm::cross(m_direction, UP); break;
+		case LEFT: finalDirection = -glm::cross(m_direction, UP); break;
 		case JUMP: finalDirection = UP;
 		}
 
@@ -40,6 +40,11 @@ namespace tmpg {
 	glm::vec3& Entity::Direction(void)
 	{
 		return m_direction;
+	}
+
+	uint32_t Entity::ID(void)
+	{
+		return m_id;
 	}
 
 }

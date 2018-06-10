@@ -1,0 +1,13 @@
+﻿  camera.cpp
+  entities_handler.cpp
+  entity.cpp
+  entity_model_3D.cpp
+  layer_3D.cpp
+  main.cpp
+  program.cpp
+  renderer_3D.cpp
+  shader.cpp
+  tmpg_engine.cpp
+c:\users\lucro\development\tmpg\tmpg\src\tmpg_engine.cpp(86): error C2660: 'tmpg::Layer3D::Render': function does not take 0 arguments
+  c:\users\lucro\development\tmpg\tmpg\src\layer_3d.h(25): note: see declaration of 'tmpg::Layer3D::Render'
+  window.cpp

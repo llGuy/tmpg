@@ -17,9 +17,9 @@ namespace tmpg {
 		void UpdateCursorPosition(const glm::vec2& pos);
 		void Look(Entity& entity, const glm::vec2& cursor, float sensitivity);
 	public:
+		glm::mat4& ViewMatrix(void);
 		uint32_t BoundEntity(void) const;
-		const glm::mat4& ViewMatrix(void) const;
-		const glm::mat4& UpdateViewMatrix(Entity& ent);
+		glm::mat4& UpdateViewMatrix(Entity& ent);
 	private:
 		// id of the entity that the camera is bound to
 		uint32_t m_boundID;

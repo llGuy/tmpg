@@ -2,9 +2,9 @@
 
 namespace tmpg {
 
-	void Renderer3D::Bind(Renderable3D& obj)
+	void Renderer3D::Bind(Renderable3D* obj)
 	{
-		m_bound = &obj;
+		m_bound = obj;
 	}
 
 	void Renderer3D::RenderElements(GLenum mode)

@@ -29,6 +29,7 @@ namespace tmpg {
 		glm::vec3 EyePosition(void) const;
 		glm::vec3& Position(void);
 		glm::vec3& Direction(void);
+		uint32_t ID(void);
 	private:
 		static constexpr glm::vec3 UP { 0.0f, 1.0f, 0.0f };
 

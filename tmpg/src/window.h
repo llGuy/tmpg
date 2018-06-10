@@ -1,6 +1,7 @@
 #ifndef _WINDOW_H_
 #define _WINDOW_H_
 
+#include <glm/glm.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -11,6 +12,8 @@ namespace tmpg {
 	extern void GLEWInit(void);
 
 	using MBCallbackFunc = GLFWmousebuttonfun;
+	using KeyCallbackFunc = GLFWkeyfun;
+	using CursorMovementFunc = GLFWcursorposfun;
 
 	class Window
 	{
@@ -26,12 +29,21 @@ namespace tmpg {
 	public:
 		int32_t Width(void) const;
 		int32_t Height(void) const;
+
+		glm::vec2 CursorPosition(void);
 	public:
 		// configuration functions
 		void WindowHint(int32_t, int32_t);
-		void UserPointer(void);
 		void InputMode(int32_t mode, int32_t val);
-		void MouseCallback(MBCallbackFunc cbfun);
+		void KeyCallback(KeyCallbackFunc func);
+		void MouseButtonCallback(MBCallbackFunc cbfun);
+		void CursorMovementCallback(CursorMovementFunc func);
+
+		template<typename _Ty>
+		void UserPointer(_Ty* ptr = nullptr)
+		{
+			glfwSetWindowUserPointer(m_glfwWindow, (!ptr) ? (_Ty*)this : ptr);
+		}
 	private:
 		int32_t m_width;
 		int32_t m_height;
