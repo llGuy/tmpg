@@ -18,14 +18,15 @@ namespace tmpg {
 			float speed, float height);
 		Entity(const glm::vec3&, const glm::vec3&, float speed);
 
-		virtual void Update(float gravity, float time);
-		virtual void Move(movement_t m, float time);
+		virtual void Update(float gravity, float time, float groundHeight);
+		virtual void Move(movement_t m, float time, float gravity);
 
 		glm::vec3 EyePosition(void) const;
 		// entities can terraform
 		int32_t& Terraforming(void);
 		glm::vec3& Direction(void);
 		glm::vec3& Position(void);
+		float& GroundHeight(void);
 		float Height(void);
 		uint32_t ID(void);
 	protected:
@@ -34,6 +35,7 @@ namespace tmpg {
 		glm::vec3 m_direction;
 		float m_speed;
 		float m_height;
+		float m_groundHeight;
 		int32_t m_terraforming;
 	};
 

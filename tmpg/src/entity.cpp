@@ -14,12 +14,12 @@ namespace tmpg {
 	{
 	}
 
-	void Entity::Update(float gravity, float time)
+	void Entity::Update(float gravity, float time, float groundHeight)
 	{
-		// update
+		
 	}
 
-	void Entity::Move(movement_t m, float time)
+	void Entity::Move(movement_t m, float time, float gravity)
 	{
 		static constexpr glm::vec3 UP = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -65,6 +65,11 @@ namespace tmpg {
 	float Entity::Height(void)
 	{
 		return m_height;
+	}
+
+	float& Entity::GroundHeight(void)
+	{
+		return m_groundHeight;
 	}
 
 }

@@ -43,11 +43,13 @@ namespace tmpg {
 	void TMPGEng::UpdateData(void)
 	{
 		float elapsed = m_timer.Elapsed();
+
+		m_entitiesHandler.UpdateEntities(m_physicsHandler.Gravity(), elapsed, m_platform);
+		m_platform.UpdateForcePoints(elapsed);
+
 		CheckMouseUpdates();
 		CheckKeyboardUpdates(elapsed);
-		m_entitiesHandler.UpdateEntities(m_physicsHandler.Gravity(), elapsed);
 
-		m_platform.UpdateForcePoints(elapsed);
 		m_timer.Reset();
 	}
 
@@ -77,12 +79,12 @@ namespace tmpg {
 	void TMPGEng::CheckKeyboardUpdates(float elapsed)
 	{
 		decltype(auto) playerBoundByCamera = m_entitiesHandler.PlayerBoundByCamera();
-		if (m_inputHandler.Key(GLFW_KEY_W)) playerBoundByCamera.Move(FORWARD, elapsed);
-		if (m_inputHandler.Key(GLFW_KEY_A)) playerBoundByCamera.Move(LEFT, elapsed);
-		if (m_inputHandler.Key(GLFW_KEY_S)) playerBoundByCamera.Move(BACKWARD, elapsed);
-		if (m_inputHandler.Key(GLFW_KEY_D)) playerBoundByCamera.Move(RIGHT, elapsed);
-		if (m_inputHandler.Key(GLFW_KEY_SPACE)) playerBoundByCamera.Move(JUMP, elapsed);
-		if (m_inputHandler.Key(GLFW_KEY_LEFT_SHIFT)) playerBoundByCamera.Move(DOWN, elapsed);
+		if (m_inputHandler.Key(GLFW_KEY_W)) playerBoundByCamera.Move(FORWARD, elapsed, m_physicsHandler.Gravity());
+		if (m_inputHandler.Key(GLFW_KEY_A)) playerBoundByCamera.Move(LEFT, elapsed, m_physicsHandler.Gravity());
+		if (m_inputHandler.Key(GLFW_KEY_S)) playerBoundByCamera.Move(BACKWARD, elapsed, m_physicsHandler.Gravity());
+		if (m_inputHandler.Key(GLFW_KEY_D)) playerBoundByCamera.Move(RIGHT, elapsed, m_physicsHandler.Gravity());
+		if (m_inputHandler.Key(GLFW_KEY_SPACE)) playerBoundByCamera.Move(JUMP, elapsed, m_physicsHandler.Gravity());
+		if (m_inputHandler.Key(GLFW_KEY_LEFT_SHIFT)) playerBoundByCamera.Move(DOWN, elapsed, m_physicsHandler.Gravity());
 	}
 
 	void TMPGEng::InitWin(void)
@@ -104,7 +106,7 @@ namespace tmpg {
 	{
 		m_entitiesHandler.Init();
 		m_entitiesHandler.PushPlayer(glm::vec3(0.01f, 0.0f, 2.0f),
-									 glm::vec3(1.0f, 0.01f, 1.0f));
+									 glm::vec3(1.0f, 0.0f, 1.0f));
 		m_entitiesHandler.PushPlayer(glm::vec3(0.0f, 0.0f, 0.0f),
 									 glm::vec3(0.01f, 0.01f, -1.0f));
 
@@ -141,16 +143,17 @@ namespace tmpg {
 		decltype(auto) view = m_entitiesHandler.CameraViewMatrix();
 		decltype(auto) projection = m_sceneLayer.ProjectionMatrix();
 		decltype(auto) sunPosition = m_physicsHandler.SunPosition();
+		glm::mat4 scale = glm::scale(glm::vec3(0.2f, 0.2f, 0.2f));
 
 		program.UseProgram();
 		for (uint32_t i = 0; i < m_entitiesHandler.NumBullets(); ++i)
 		{
 			// get all necessary data for draw call
 			glm::vec3 modelColor(0.2f, 0.2f, 0.2f);
-			glm::mat4 translation = glm::translate(m_entitiesHandler.BulletAt(i).Position());
+			glm::mat4 modelMatrix = glm::translate(m_entitiesHandler.BulletAt(i).Position()) * scale;
 			// prepare shader program
 			program.Uniform3f(&modelColor[0], 0);
-			program.UniformMat4(&translation[0][0], 1);
+			program.UniformMat4(&modelMatrix[0][0], 1);
 			program.UniformMat4(&view[0][0], 2);
 			program.UniformMat4(&projection[0][0], 3);
 			program.Uniform3f(&sunPosition[0], 4);

@@ -4,7 +4,7 @@ namespace tmpg { namespace physics {
 
 	PhysicsHandler::PhysicsHandler(void)
 		: m_sunPosition(30.0f, 50.0f, 30.0f),
-		m_gravity(-9.5f)
+		m_gravity(-10.5f)
 	{
 	}
 

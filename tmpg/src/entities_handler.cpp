@@ -1,4 +1,5 @@
 #include "entities_handler.h"
+#include "utils.h"
 
 namespace tmpg {
 
@@ -8,19 +9,57 @@ namespace tmpg {
 
 	void EntitiesHandler::Init(void)
 	{
-		m_payerModel = new EntityModel3D(0.5f);
+		m_payerModel = new EntityModel3D(ENTITY_MODEL_RADIUS);
 		m_payerModel->GenerateData();
 		m_bulletTimer.Start();
 	}
 
-	void EntitiesHandler::UpdateEntities(float gravity, float time)
+	void EntitiesHandler::UpdateEntities(float gravity, float time, Platform& platform)
 	{
 		std::for_each(m_players.begin(), m_players.end(),
-			[&](Player& player) -> void { player.Update(gravity, time); });
+			[&](Player& player) -> void 
+		{ 
+			decltype(auto) position = player.Position();
+			player.Update(gravity, time, platform.HeightAtPoint(position.x, position.z)); 
+		});
 
 		std::for_each(m_bullets.begin(), m_bullets.end(),
-			[&](Bullet& bullet) -> void { bullet.Update(gravity, time); });
+			[&](Bullet& bullet) -> void { bullet.Update(gravity, time, 0.0f); 
+		/* ground height collision gets calculated separately */ });
+
+		uint32_t eliminatedBullets = 0;
+		for (uint32_t i = 0; i < m_bullets.size(); ++i)
+		{
+			auto bcrv = QueryBulletCollision(platform, m_bullets[i]);
+			if (std::get<bool>(bcrv))
+			{
+				m_bullets[i] = m_bullets[m_bullets.size() - eliminatedBullets - 1];
+				eliminatedBullets++;
+			}
+		}
+		for (uint32_t i = 0; i < eliminatedBullets; ++i)
+		{
+			m_bullets.pop_back();
+		}
+
 		m_camera.UpdateViewMatrix(PlayerBoundByCamera());
+	}
+
+	EntitiesHandler::BulletCollisionRV EntitiesHandler::QueryBulletCollision(Platform& platform, Bullet& bullet)
+	{
+		// if bullet hit the terrain
+		float platformHeight = platform.HeightAtPoint(bullet.Position().x, bullet.Position().z);
+		if (utils::Equf(platformHeight, bullet.Position().y) || platformHeight > bullet.Position().y)
+			return std::make_tuple<bool, std::optional<uint32_t>>(true, std::optional<uint32_t>{ /* empty */ });
+
+		uint32_t playerIndex = 0;
+		for (; playerIndex < m_players.size(); ++playerIndex)
+		{
+			float distance = glm::distance(bullet.Position(), m_players[playerIndex].EyePosition());
+			if (distance < BULLET_MODEL_RADIUS + ENTITY_MODEL_RADIUS)
+				return std::make_tuple<bool, std::optional<uint32_t>>(true, std::optional<uint32_t>(playerIndex));
+		}
+		return std::make_tuple<bool, std::optional<uint32_t>>(false, std::optional<uint32_t>());
 	}
 
 	void EntitiesHandler::BindCamera(uint32_t index)
@@ -35,10 +74,10 @@ namespace tmpg {
 
 	void EntitiesHandler::PushBullet(void)
 	{
-		if (m_bulletTimer.Elapsed() > 0.5f)
+		if (m_bulletTimer.Elapsed() > 0.2f)
 		{
-			Player& bund = PlayerBoundByCamera();
-			m_bullets.emplace_back(player.Position(), player.Direction());
+			Player& bound = PlayerBoundByCamera();
+			m_bullets.emplace_back(bound.EyePosition(), bound.Direction());
 			m_bulletTimer.Reset();
 		}
 	}
@@ -53,7 +92,7 @@ namespace tmpg {
 		return m_bullets[index];
 	}
 
-	Renderable3D* EntitiesHandler::Model3D(void) 
+	Renderable3D* EntitiesHandler::Model3D(void)
 	{
 		return m_payerModel;
 	}
@@ -62,7 +101,7 @@ namespace tmpg {
 	{
 		return m_players.size();
 	}
-	
+
 	uint32_t EntitiesHandler::NumBullets(void) const
 	{
 		return m_bullets.size();
@@ -73,7 +112,7 @@ namespace tmpg {
 		return m_players[m_camera.BoundEntity()];
 	}
 
-	glm::mat4& EntitiesHandler::CameraViewMatrix(void) 
+	glm::mat4& EntitiesHandler::CameraViewMatrix(void)
 	{
 		return m_camera.ViewMatrix();
 	}

@@ -20,13 +20,15 @@ namespace tmpg {
 		Player(const glm::vec3& p, const glm::vec3& d, uint32_t id);
 
 		// update without gravity
-		void Update(float gravity, float time) override;
-		void Move(movement_t m, float time) override;
+		void Update(float gravity, float time, float groundHeight) override;
+		void Move(movement_t m, float time, float gravity) override;
 	private:
 		void Jump(float, float);
-		void GravityForce(float, float);
 	private:
 		static constexpr glm::vec3 UP { 0.0f, 1.0f, 0.0f };
+
+		// for jumping
+		float m_velocity;
 	};
 
 }

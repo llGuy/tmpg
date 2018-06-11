@@ -43,7 +43,7 @@ namespace tmpg {
 	glm::mat4& Camera::UpdateViewMatrix(Entity& ent)
 	{
 		static constexpr glm::vec3 UP = glm::vec3(0.0f, 1.0f, 0.0f);
-		return (m_viewMatrix = glm::lookAt(ent.Position(), ent.Position() + ent.Direction(), UP));
+		return (m_viewMatrix = glm::lookAt(ent.EyePosition(), ent.EyePosition() + ent.Direction(), UP));
 	}
 
 }
