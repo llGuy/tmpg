@@ -1,11 +1,12 @@
 #include <iostream>
+#include <cmath>
 
 #include "player.h"
 
 namespace tmpg {
 
 	Player::Player(const glm::vec3& p, const glm::vec3& d, uint32_t id)
-		: Entity(p, d, id, 4.0f, 0.5f), m_velocity(0.0f)
+		: Entity(p, d, id, 4.0f, 0.5f), m_velocity(0.0f), m_angleUnder0(false)
 	{
 	}
 
@@ -55,6 +56,14 @@ namespace tmpg {
 			m_position.y = m_position.y + m_velocity * timedelta;
 			m_velocity = m_velocity + gravity * timedelta;
 		}
+	}
+
+	glm::vec3 Player::Angle(void)
+	{
+		glm::vec3 angles = m_direction;
+		float x = asin(angles.x);
+		angles.y = x;
+		return glm::vec3(0.0f, angles.y, 0.0f);
 	}
 
 }

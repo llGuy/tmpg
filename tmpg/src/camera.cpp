@@ -2,6 +2,11 @@
 
 namespace tmpg {
 
+	Camera::Camera(void)
+		: m_angles(60.0f, 60.0f), m_distance(5.0f)
+	{
+	}
+
 	void Camera::Bind(uint32_t id)
 	{
 		m_boundID = id;
@@ -19,15 +24,33 @@ namespace tmpg {
 		glm::vec2 cursorPosDiff = cursor - m_cursorPosition;
 		m_cursorPosition = cursor;
 
-		glm::vec3& edir = entity.Direction();
-		glm::vec3 eye = entity.EyePosition();
+		if (m_thirdPerson)
+		{
+			m_angles.x -= cursorPosDiff.x * sensitivity;
+			m_angles.y -= cursorPosDiff.y * sensitivity;
 
-		float xAngle = glm::radians(-cursorPosDiff.x) * sensitivity;
-		edir = glm::mat3(glm::rotate(xAngle, UP)) * edir;
+			m_direction = glm::vec3(-sin(glm::radians(m_angles.x)), -cos(glm::radians(m_angles.y)), -cos(glm::radians(m_angles.x)));
 
-		glm::vec3 rotateYAx = glm::cross(edir, UP);
-		float yAngle = glm::radians(-cursorPosDiff.y) * sensitivity;
-		edir = glm::mat3(glm::rotate(yAngle, rotateYAx)) * edir;
+			entity.Direction() = glm::normalize(glm::vec3(m_direction.x, 0.0f, m_direction.z));
+		}
+		else
+		{
+			float xAngle = glm::radians(-cursorPosDiff.x) * sensitivity;
+			float yAngle = glm::radians(-cursorPosDiff.y) * sensitivity;
+
+			glm::vec3& edir = entity.Direction();
+			glm::vec3 eye = entity.EyePosition();
+
+			edir = glm::mat3(glm::rotate(xAngle, UP)) * edir;
+
+			glm::vec3 rotateYAx = glm::cross(edir, UP);
+			edir = glm::mat3(glm::rotate(yAngle, rotateYAx)) * edir;
+		}
+	}
+
+	void Camera::ToggleFirstThirdPerson(void)
+	{
+		m_thirdPerson ^= true;
 	}
 
 	uint32_t Camera::BoundEntity(void) const
@@ -43,7 +66,20 @@ namespace tmpg {
 	glm::mat4& Camera::UpdateViewMatrix(Entity& ent)
 	{
 		static constexpr glm::vec3 UP = glm::vec3(0.0f, 1.0f, 0.0f);
-		return (m_viewMatrix = glm::lookAt(ent.EyePosition(), ent.EyePosition() + ent.Direction(), UP));
+
+		if (m_thirdPerson)
+		{
+			m_position = ent.EyePosition() - m_direction * m_distance;
+			glm::vec3 position = m_position;
+			if (m_position.y < ent.GroundHeight() + 0.3f) position.y = ent.GroundHeight();
+			return (m_viewMatrix = glm::lookAt(position, position + m_direction, UP));
+		}
+		else return (m_viewMatrix = glm::lookAt(ent.EyePosition(), ent.EyePosition() + ent.Direction(), UP));
+	}
+
+	bool Camera::ThirdPerson(void)
+	{
+		return m_thirdPerson;
 	}
 
 }

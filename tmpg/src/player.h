@@ -22,6 +22,8 @@ namespace tmpg {
 		// update without gravity
 		void Update(float gravity, float time, float groundHeight) override;
 		void Move(movement_t m, float time, float gravity) override;
+
+		glm::vec3 Angle(void);
 	private:
 		void Jump(float, float);
 	private:
@@ -29,6 +31,8 @@ namespace tmpg {
 
 		// for jumping
 		float m_velocity;
+
+		bool m_angleUnder0;
 	};
 
 }

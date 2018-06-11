@@ -12,6 +12,7 @@ namespace tmpg {
 		m_payerModel = new EntityModel3D(ENTITY_MODEL_RADIUS);
 		m_payerModel->GenerateData();
 		m_bulletTimer.Start();
+		m_toggleThirdPersonTimer.Start();
 	}
 
 	void EntitiesHandler::UpdateEntities(float gravity, float time, Platform& platform)
@@ -45,6 +46,15 @@ namespace tmpg {
 		m_camera.UpdateViewMatrix(PlayerBoundByCamera());
 	}
 
+	void EntitiesHandler::ToggleThirdPerson(void)
+	{
+		if (m_toggleThirdPersonTimer.Elapsed() > 0.1f)
+		{
+			m_camera.ToggleFirstThirdPerson();
+			m_toggleThirdPersonTimer.Reset();
+		}
+	}
+
 	EntitiesHandler::BulletCollisionRV EntitiesHandler::QueryBulletCollision(Platform& platform, Bullet& bullet)
 	{
 		// if bullet hit the terrain
@@ -74,7 +84,7 @@ namespace tmpg {
 
 	void EntitiesHandler::PushBullet(void)
 	{
-		if (m_bulletTimer.Elapsed() > 0.2f)
+		if (m_bulletTimer.Elapsed() > 0.1f)
 		{
 			Player& bound = PlayerBoundByCamera();
 			m_bullets.emplace_back(bound.EyePosition(), bound.Direction());
@@ -130,6 +140,11 @@ namespace tmpg {
 	void EntitiesHandler::UpdateCameraCursorPosition(const glm::vec2& p)
 	{
 		m_camera.UpdateCursorPosition(p);
+	}
+
+	bool EntitiesHandler::ThirdPerson(void)
+	{
+		return m_camera.ThirdPerson();
 	}
 
 }

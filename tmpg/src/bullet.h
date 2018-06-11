@@ -12,8 +12,13 @@ namespace tmpg {
 		Bullet(const glm::vec3&, const glm::vec3& dir);
 
 		void Update(float gravity, float time, float groundHeight) override;
+		float Angle(float);
 	private:
 		float m_resistance;
+
+		// throwing the bullets, they turn
+		float m_angle;
+		float m_rotationIntensity;
 	};
 
 }

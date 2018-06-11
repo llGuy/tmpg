@@ -85,6 +85,7 @@ namespace tmpg {
 		if (m_inputHandler.Key(GLFW_KEY_D)) playerBoundByCamera.Move(RIGHT, elapsed, m_physicsHandler.Gravity());
 		if (m_inputHandler.Key(GLFW_KEY_SPACE)) playerBoundByCamera.Move(JUMP, elapsed, m_physicsHandler.Gravity());
 		if (m_inputHandler.Key(GLFW_KEY_LEFT_SHIFT)) playerBoundByCamera.Move(DOWN, elapsed, m_physicsHandler.Gravity());
+		if (m_inputHandler.Key(GLFW_KEY_T)) m_entitiesHandler.ToggleThirdPerson();
 	}
 
 	void TMPGEng::InitWin(void)
@@ -107,8 +108,8 @@ namespace tmpg {
 		m_entitiesHandler.Init();
 		m_entitiesHandler.PushPlayer(glm::vec3(0.01f, 0.0f, 2.0f),
 									 glm::vec3(1.0f, 0.0f, 1.0f));
-		m_entitiesHandler.PushPlayer(glm::vec3(0.0f, 0.0f, 0.0f),
-									 glm::vec3(0.01f, 0.01f, -1.0f));
+		//m_entitiesHandler.PushPlayer(glm::vec3(0.0f, 0.0f, 0.0f),
+		//							 glm::vec3(0.01f, 0.01f, -1.0f));
 
 		// initialize camera
 		m_entitiesHandler.BindCamera(0); // first entity
@@ -148,9 +149,12 @@ namespace tmpg {
 		program.UseProgram();
 		for (uint32_t i = 0; i < m_entitiesHandler.NumBullets(); ++i)
 		{
+			Bullet& bullet = m_entitiesHandler.BulletAt(i);
 			// get all necessary data for draw call
 			glm::vec3 modelColor(0.2f, 0.2f, 0.2f);
-			glm::mat4 modelMatrix = glm::translate(m_entitiesHandler.BulletAt(i).Position()) * scale;
+			glm::vec3 r = bullet.Direction();		r.z = -1.0f; r.y = 0.0f;
+			glm::mat4 rotation = glm::rotate(bullet.Angle(m_timer.Elapsed()), r);
+			glm::mat4 modelMatrix = glm::translate(bullet.Position()) * rotation * scale;
 			// prepare shader program
 			program.Uniform3f(&modelColor[0], 0);
 			program.UniformMat4(&modelMatrix[0][0], 1);
@@ -175,14 +179,16 @@ namespace tmpg {
 		for (uint32_t i = 0; i < m_entitiesHandler.NumPlayers(); ++i)
 		{
 			// only render the entities that the camera can see
-			if (i != m_entitiesHandler.PlayerBoundByCamera().ID())
+			if (i != m_entitiesHandler.PlayerBoundByCamera().ID() || m_entitiesHandler.ThirdPerson())
 			{
 				// get all necessary data for draw call
 				glm::vec3 modelColor(0.2f, 0.2f, 0.2f);
 				glm::mat4 translation = glm::translate(m_entitiesHandler[i].EyePosition());
+				glm::vec3 angle = m_entitiesHandler[i].Angle();
+				glm::mat4 model = translation * glm::rotate(angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
 				// prepare shader program
 				program.Uniform3f(&modelColor[0], 0);
-				program.UniformMat4(&translation[0][0], 1);
+				program.UniformMat4(&model[0][0], 1);
 				program.UniformMat4(&view[0][0], 2);
 				program.UniformMat4(&projection[0][0], 3);
 				program.Uniform3f(&sunPosition[0], 4);

@@ -34,12 +34,14 @@ namespace tmpg {
 		void UpdateCameraDirection(const glm::vec2&, float);
 		void UpdateCameraCursorPosition(const glm::vec2&);
 		void UpdateViewMatrix(void);
+		void ToggleThirdPerson(void);
 	public:
 		Player& operator[](uint32_t index);
 		Bullet& BulletAt(uint32_t index);
 		Renderable3D* Model3D(void);
 		uint32_t NumPlayers(void) const;
 		uint32_t NumBullets(void) const;
+		bool ThirdPerson(void);
 	private:
 		using BulletCollisionRV = std::tuple<bool, std::optional<uint32_t>>;
 		BulletCollisionRV QueryBulletCollision(Platform& terrain, Bullet& bullet);
@@ -48,7 +50,9 @@ namespace tmpg {
 		std::vector<Bullet> m_bullets;
 		Renderable3D* m_payerModel;
 		Camera m_camera;
+
 		Timer m_bulletTimer;
+		Timer m_toggleThirdPersonTimer;
 	};
 
 }
