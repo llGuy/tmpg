@@ -1,6 +1,7 @@
 #ifndef _ENTITY_H_
 #define _ENTITY_H_
 
+#include <utility>
 #include <glm/glm.hpp>
 
 namespace tmpg {
@@ -10,36 +11,29 @@ namespace tmpg {
 		FORWARD, BACKWARD, LEFT, RIGHT, JUMP, DOWN, RUN
 	};
 
-	enum state_t
-	{
-		GRAVITY
-	};
-
-	// there will only be one type of entity
 	class Entity
 	{
 	public:
-		Entity(const glm::vec3& p, const glm::vec3& d, uint32_t id);
+		Entity(const glm::vec3&, const glm::vec3&, uint32_t id,
+			float speed, float height);
+		Entity(const glm::vec3&, const glm::vec3&, float speed);
 
-		// update without gravity
-		void Update(void);
-	public:
-		void Move(movement_t m, float time);
+		virtual void Update(float gravity, float time);
+		virtual void Move(movement_t m, float time);
 
 		glm::vec3 EyePosition(void) const;
+		// entities can terraform
 		int32_t& Terraforming(void);
 		glm::vec3& Direction(void);
 		glm::vec3& Position(void);
 		float Height(void);
 		uint32_t ID(void);
-	private:
-		static constexpr glm::vec3 UP { 0.0f, 1.0f, 0.0f };
-
+	protected:
+		uint32_t m_id;
 		glm::vec3 m_position;
 		glm::vec3 m_direction;
 		float m_speed;
 		float m_height;
-		uint32_t m_id;
 		int32_t m_terraforming;
 	};
 

@@ -162,7 +162,7 @@ namespace tmpg {
 						glm::ivec2 meshSpace = WorldtoMeshSpace(glm::vec2(x, z));
 
 						entity.Terraforming() = m_forcePoints.size();
-						m_forcePoints.push_back({ ForcePoint(meshSpace, 1.0f), entity.ID() });
+						m_forcePoints.push_back({ ForcePoint(meshSpace, 8.0f), entity.ID() });
 						break;
 					}
 				}

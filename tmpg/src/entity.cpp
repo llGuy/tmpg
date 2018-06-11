@@ -2,18 +2,27 @@
 
 namespace tmpg {
 
-	Entity::Entity(const glm::vec3& p, const glm::vec3& d, uint32_t id)
-		: m_position(p), m_direction(d), m_id(id), m_speed(0.2f), m_height(0.5f), m_terraforming(-1)
+	Entity::Entity(const glm::vec3& p, const glm::vec3& d, uint32_t id,
+		float speed, float height)
+		: m_position(p), m_direction(d), m_id(id), m_speed(speed), m_height(height),
+		m_terraforming(-1)
 	{
 	}
 
-	void Entity::Update(void)
+	Entity::Entity(const glm::vec3& p, const glm::vec3& d, float speed)
+		: m_position(p), m_direction(d), m_speed(speed)
 	{
-		// update some data
+	}
+
+	void Entity::Update(float gravity, float time)
+	{
+		// update
 	}
 
 	void Entity::Move(movement_t m, float time)
 	{
+		static constexpr glm::vec3 UP = glm::vec3(0.0f, 1.0f, 0.0f);
+
 		glm::vec3 finalDirection;
 		switch (m)
 		{

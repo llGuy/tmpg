@@ -14,6 +14,14 @@ namespace tmpg {
 		m_platform.Generate();
 		InitLayers();
 		Configure();
+
+		// initialize timer
+		m_timer.Start();
+	}
+
+	float TMPGEng::FPS(void)
+	{
+		return m_timer.FPS();
 	}
 
 	void TMPGEng::Render(void)
@@ -22,7 +30,8 @@ namespace tmpg {
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		glEnable(GL_DEPTH_TEST);
-		RenderEntities();
+		RenderPlayers();
+		RenderBullets();
 		RenderPlatforms();
 	}
 
@@ -33,12 +42,13 @@ namespace tmpg {
 
 	void TMPGEng::UpdateData(void)
 	{
+		float elapsed = m_timer.Elapsed();
 		CheckMouseUpdates();
-		CheckKeyboardUpdates();
-		m_entitiesHandler.UpdateEntities();
+		CheckKeyboardUpdates(elapsed);
+		m_entitiesHandler.UpdateEntities(m_physicsHandler.Gravity(), elapsed);
 
-#define TIME 0.02f
-		m_platform.UpdateForcePoints(TIME);
+		m_platform.UpdateForcePoints(elapsed);
+		m_timer.Reset();
 	}
 
 	void TMPGEng::Configure(void)
@@ -57,21 +67,22 @@ namespace tmpg {
 		}
 
 		// mouse buttons
-		if (m_inputHandler.MouseButton(GLFW_MOUSE_BUTTON_2)) m_platform.HandleAction(START_TERRAFORMING, m_entitiesHandler.EntityBoundByCamera());
-		else m_platform.HandleAction(END_TERRAFORMING, m_entitiesHandler.EntityBoundByCamera());
+		decltype(auto) player = m_entitiesHandler.PlayerBoundByCamera();
+		if (m_inputHandler.MouseButton(GLFW_MOUSE_BUTTON_1)) m_entitiesHandler.PushBullet();
+
+		if (m_inputHandler.MouseButton(GLFW_MOUSE_BUTTON_2)) m_platform.HandleAction(START_TERRAFORMING, player);
+		else m_platform.HandleAction(END_TERRAFORMING, player);
 	}
 
-	void TMPGEng::CheckKeyboardUpdates(void)
+	void TMPGEng::CheckKeyboardUpdates(float elapsed)
 	{
-		// temporary
-#define TIME 0.02f
-		decltype(auto) entityBoundByCamera = m_entitiesHandler.EntityBoundByCamera();
-		if (m_inputHandler.Key(GLFW_KEY_W)) entityBoundByCamera.Move(FORWARD, TIME);
-		if (m_inputHandler.Key(GLFW_KEY_A)) entityBoundByCamera.Move(LEFT, TIME);
-		if (m_inputHandler.Key(GLFW_KEY_S)) entityBoundByCamera.Move(BACKWARD, TIME);
-		if (m_inputHandler.Key(GLFW_KEY_D)) entityBoundByCamera.Move(RIGHT, TIME);
-		if (m_inputHandler.Key(GLFW_KEY_SPACE)) entityBoundByCamera.Move(JUMP, TIME);
-		if (m_inputHandler.Key(GLFW_KEY_LEFT_SHIFT)) entityBoundByCamera.Move(DOWN, TIME);
+		decltype(auto) playerBoundByCamera = m_entitiesHandler.PlayerBoundByCamera();
+		if (m_inputHandler.Key(GLFW_KEY_W)) playerBoundByCamera.Move(FORWARD, elapsed);
+		if (m_inputHandler.Key(GLFW_KEY_A)) playerBoundByCamera.Move(LEFT, elapsed);
+		if (m_inputHandler.Key(GLFW_KEY_S)) playerBoundByCamera.Move(BACKWARD, elapsed);
+		if (m_inputHandler.Key(GLFW_KEY_D)) playerBoundByCamera.Move(RIGHT, elapsed);
+		if (m_inputHandler.Key(GLFW_KEY_SPACE)) playerBoundByCamera.Move(JUMP, elapsed);
+		if (m_inputHandler.Key(GLFW_KEY_LEFT_SHIFT)) playerBoundByCamera.Move(DOWN, elapsed);
 	}
 
 	void TMPGEng::InitWin(void)
@@ -92,9 +103,9 @@ namespace tmpg {
 	void TMPGEng::InitEntities(void)
 	{
 		m_entitiesHandler.Init();
-		m_entitiesHandler.PushEntity(glm::vec3(0.01f, 0.0f, 2.0f),
+		m_entitiesHandler.PushPlayer(glm::vec3(0.01f, 0.0f, 2.0f),
 									 glm::vec3(1.0f, 0.01f, 1.0f));
-		m_entitiesHandler.PushEntity(glm::vec3(0.0f, 0.0f, 0.0f),
+		m_entitiesHandler.PushPlayer(glm::vec3(0.0f, 0.0f, 0.0f),
 									 glm::vec3(0.01f, 0.01f, -1.0f));
 
 		// initialize camera
@@ -121,21 +132,47 @@ namespace tmpg {
 	{
 		return m_win.Open();
 	}
+
+	void TMPGEng::RenderBullets(void)
+	{
+		m_sceneLayer.BindRenderer(0);
+
+		decltype(auto) program = m_sceneLayer.ShaderProgram();
+		decltype(auto) view = m_entitiesHandler.CameraViewMatrix();
+		decltype(auto) projection = m_sceneLayer.ProjectionMatrix();
+		decltype(auto) sunPosition = m_physicsHandler.SunPosition();
+
+		program.UseProgram();
+		for (uint32_t i = 0; i < m_entitiesHandler.NumBullets(); ++i)
+		{
+			// get all necessary data for draw call
+			glm::vec3 modelColor(0.2f, 0.2f, 0.2f);
+			glm::mat4 translation = glm::translate(m_entitiesHandler.BulletAt(i).Position());
+			// prepare shader program
+			program.Uniform3f(&modelColor[0], 0);
+			program.UniformMat4(&translation[0][0], 1);
+			program.UniformMat4(&view[0][0], 2);
+			program.UniformMat4(&projection[0][0], 3);
+			program.Uniform3f(&sunPosition[0], 4);
+			// ready to render
+			m_sceneLayer.Render(GL_TRIANGLES);
+		}
+	}
 	
-	void TMPGEng::RenderEntities(void)
+	void TMPGEng::RenderPlayers(void)
 	{
 		// bind to entity model
 		m_sceneLayer.BindRenderer(0);
 
 		decltype(auto) program = m_sceneLayer.ShaderProgram();
-		program.UseProgram();
-		glm::mat4& view = m_entitiesHandler.CameraViewMatrix();
-		glm::mat4& projection = m_sceneLayer.ProjectionMatrix();
+		decltype(auto) view = m_entitiesHandler.CameraViewMatrix();
+		decltype(auto) projection = m_sceneLayer.ProjectionMatrix();
 		decltype(auto) sunPosition = m_physicsHandler.SunPosition();
-		for (uint32_t i = 0; i < m_entitiesHandler.Size(); ++i)
+		program.UseProgram();
+		for (uint32_t i = 0; i < m_entitiesHandler.NumPlayers(); ++i)
 		{
 			// only render the entities that the camera can see
-			if (i != m_entitiesHandler.EntityBoundByCamera().ID())
+			if (i != m_entitiesHandler.PlayerBoundByCamera().ID())
 			{
 				// get all necessary data for draw call
 				glm::vec3 modelColor(0.2f, 0.2f, 0.2f);
@@ -158,10 +195,10 @@ namespace tmpg {
 		m_sceneLayer.BindRenderer(1);
 
 		decltype(auto) program = m_sceneLayer.ShaderProgram();
-		program.UseProgram();
 		decltype(auto) view = m_entitiesHandler.CameraViewMatrix();
 		decltype(auto) projection = m_sceneLayer.ProjectionMatrix();
 		decltype(auto) sunPosition = m_physicsHandler.SunPosition();
+		program.UseProgram();
 
 		glm::vec3 modelColor(0.8f, 0.4f, 0.0f);
 		glm::mat4 translation(1.0f);

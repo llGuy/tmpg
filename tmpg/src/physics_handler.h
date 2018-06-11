@@ -11,8 +11,10 @@ namespace tmpg { namespace physics {
 		PhysicsHandler(void);
 
 		glm::vec3& SunPosition(void);
+		float Gravity(void) const;
 	private:
 		glm::vec3 m_sunPosition;
+		float m_gravity;
 	};
 
 }	}

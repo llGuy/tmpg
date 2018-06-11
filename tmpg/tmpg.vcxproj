@@ -127,11 +127,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\bullet.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\entities_handler.cpp" />
     <ClCompile Include="src\entity.cpp" />
+    <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\entity_model_3D.cpp" />
     <ClCompile Include="src\input_handler.cpp" />
+    <ClCompile Include="src\timer.cpp" />
     <ClCompile Include="src\layer_3D.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\physics_handler.cpp" />
@@ -145,10 +148,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\buffer.h" />
+    <ClInclude Include="src\bullet.h" />
     <ClInclude Include="src\camera.h" />
     <ClInclude Include="src\configs.h" />
     <ClInclude Include="src\entities_handler.h" />
     <ClInclude Include="src\entity.h" />
+    <ClInclude Include="src\player.h" />
     <ClInclude Include="src\entity_model_3D.h" />
     <ClInclude Include="src\input_handler.h" />
     <ClInclude Include="src\layer_3D.h" />
@@ -161,6 +166,7 @@
     <ClInclude Include="src\renderable_3D.h" />
     <ClInclude Include="src\renderer_3D.h" />
     <ClInclude Include="src\shader.h" />
+    <ClInclude Include="src\timer.h" />
     <ClInclude Include="src\tmpg_engine.h" />
     <ClInclude Include="src\utils.h" />
     <ClInclude Include="src\vao.h" />

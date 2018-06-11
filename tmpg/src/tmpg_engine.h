@@ -10,6 +10,7 @@
 #include "program.h"
 #include "configs.h"
 #include "window.h"
+#include "timer.h"
 
 #define DISPLAY_WIDTH 2600
 #define DISPLAY_HEIGHT 1200
@@ -27,6 +28,7 @@ namespace tmpg {
 		void UpdateData(void);
 
 		bool Running(void) const;
+		float FPS(void);
 	public:
 		void InitWin(void);
 		void InitLayers(void);
@@ -34,12 +36,14 @@ namespace tmpg {
 		void Configure(void);
 	private:
 		// render
-		void RenderEntities(void);
+		void RenderBullets(void);
+		void RenderPlayers(void);
 		void RenderPlatforms(void);
 		void CheckMouseUpdates(void);
-		void CheckKeyboardUpdates(void);
+		void CheckKeyboardUpdates(float);
 	private:
 		Window m_win;
+		Timer m_timer;
 		Configs m_configs;
 		Layer3D m_sceneLayer;
 		InputHandler m_inputHandler;

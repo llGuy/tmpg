@@ -8,15 +8,19 @@ namespace tmpg {
 
 	void EntitiesHandler::Init(void)
 	{
-		m_entity3DModel = new EntityModel3D(0.5f);
-		m_entity3DModel->GenerateData();
+		m_payerModel = new EntityModel3D(0.5f);
+		m_payerModel->GenerateData();
+		m_bulletTimer.Start();
 	}
 
-	void EntitiesHandler::UpdateEntities(void)
+	void EntitiesHandler::UpdateEntities(float gravity, float time)
 	{
-		std::for_each(m_entities.begin(), m_entities.end(),
-			[](Entity& entity) -> void { entity.Update(); });
-		m_camera.UpdateViewMatrix(EntityBoundByCamera());
+		std::for_each(m_players.begin(), m_players.end(),
+			[&](Player& player) -> void { player.Update(gravity, time); });
+
+		std::for_each(m_bullets.begin(), m_bullets.end(),
+			[&](Bullet& bullet) -> void { bullet.Update(gravity, time); });
+		m_camera.UpdateViewMatrix(PlayerBoundByCamera());
 	}
 
 	void EntitiesHandler::BindCamera(uint32_t index)
@@ -24,29 +28,49 @@ namespace tmpg {
 		m_camera.Bind(index);
 	}
 
-	void EntitiesHandler::PushEntity(const glm::vec3& p, const glm::vec3& d)
+	void EntitiesHandler::PushPlayer(const glm::vec3& p, const glm::vec3& d)
 	{
-		m_entities.emplace_back(p, d, m_entities.size());
+		m_players.emplace_back(p, d, m_players.size());
 	}
 
-	Entity& EntitiesHandler::operator[](uint32_t index)
+	void EntitiesHandler::PushBullet(void)
 	{
-		return m_entities[index];
+		if (m_bulletTimer.Elapsed() > 0.5f)
+		{
+			Player& bund = PlayerBoundByCamera();
+			m_bullets.emplace_back(player.Position(), player.Direction());
+			m_bulletTimer.Reset();
+		}
+	}
+
+	Player& EntitiesHandler::operator[](uint32_t index)
+	{
+		return m_players[index];
+	}
+
+	Bullet& EntitiesHandler::BulletAt(uint32_t index)
+	{
+		return m_bullets[index];
 	}
 
 	Renderable3D* EntitiesHandler::Model3D(void) 
 	{
-		return m_entity3DModel;
+		return m_payerModel;
 	}
 
-	uint32_t EntitiesHandler::Size(void) const
+	uint32_t EntitiesHandler::NumPlayers(void) const
 	{
-		return m_entities.size();
+		return m_players.size();
+	}
+	
+	uint32_t EntitiesHandler::NumBullets(void) const
+	{
+		return m_bullets.size();
 	}
 
-	Entity& EntitiesHandler::EntityBoundByCamera(void)
+	Player& EntitiesHandler::PlayerBoundByCamera(void)
 	{
-		return m_entities[m_camera.BoundEntity()];
+		return m_players[m_camera.BoundEntity()];
 	}
 
 	glm::mat4& EntitiesHandler::CameraViewMatrix(void) 
@@ -56,12 +80,12 @@ namespace tmpg {
 
 	void EntitiesHandler::UpdateCameraDirection(const glm::vec2& cursorPosition, float sens)
 	{
-		m_camera.Look(EntityBoundByCamera(), cursorPosition, sens);
+		m_camera.Look(PlayerBoundByCamera(), cursorPosition, sens);
 	}
 
 	void EntitiesHandler::UpdateViewMatrix(void)
 	{
-		m_camera.UpdateViewMatrix(EntityBoundByCamera());
+		m_camera.UpdateViewMatrix(PlayerBoundByCamera());
 	}
 
 	void EntitiesHandler::UpdateCameraCursorPosition(const glm::vec2& p)

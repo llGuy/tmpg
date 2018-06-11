@@ -15,12 +15,15 @@ int32_t main(int32_t argc, char* argv[])
 
 	while (engine.Running())
 	{
-		engine.UpdateData();
 		engine.Render();
 		engine.UpdateWin();
+		engine.UpdateData();
 	}
 
 	GLFWTerminate();
+
+	std::cout << "FPS COUNT : " << engine.FPS() << std::endl;
+	std::cin.get();
 
 	return 0;
 }

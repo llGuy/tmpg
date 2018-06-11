@@ -3,8 +3,9 @@
 
 #include <vector>
 
+#include "bullet.h"
 #include "camera.h"
-#include "entity.h"
+#include "player.h"
 #include "program.h"
 #include "entity_model_3D.h"
 
@@ -15,24 +16,29 @@ namespace tmpg {
 	public:
 		EntitiesHandler(void);
 		void Init(void);
-		void UpdateEntities(void);
+		void UpdateEntities(float gravity, float time);
 		void BindCamera(uint32_t index);
-		void PushEntity(const glm::vec3&, const glm::vec3&);
+		void PushPlayer(const glm::vec3&, const glm::vec3&);
+		void PushBullet(void);
 	public:
 		// camera-related functions
 		glm::mat4& CameraViewMatrix(void);
-		Entity& EntityBoundByCamera(void);
+		Player& PlayerBoundByCamera(void);
 		void UpdateCameraDirection(const glm::vec2&, float);
 		void UpdateCameraCursorPosition(const glm::vec2&);
 		void UpdateViewMatrix(void);
 	public:
-		Entity& operator[](uint32_t index);
+		Player& operator[](uint32_t index);
+		Bullet& BulletAt(uint32_t index);
 		Renderable3D* Model3D(void);
-		uint32_t Size(void) const;
+		uint32_t NumPlayers(void) const;
+		uint32_t NumBullets(void) const;
 	private:
-		std::vector<Entity> m_entities;
-		Renderable3D* m_entity3DModel;
+		std::vector<Player> m_players;
+		std::vector<Bullet> m_bullets;
+		Renderable3D* m_payerModel;
 		Camera m_camera;
+		Timer m_bulletTimer;
 	};
 
 }
