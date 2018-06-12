@@ -4,29 +4,57 @@
 #include <vector>
 #include <glm/glm.hpp>
 
+#include "batch_renderer.h"
 #include "renderable_3D.h"
 #include "renderer_3D.h"
 #include "program.h"
 
 namespace tmpg { 
 
-	// layer for rendering 3D scene
 	class Layer3D
 	{
 	public:
-		Layer3D(float fov, float aspect, float near, float far);
 		~Layer3D(void) = default;
 
-		void PushObject(Renderable3D* object);
-		void BindRenderer(uint32_t object);
-	public:
-		glm::mat4& ProjectionMatrix(void);
-		::gl::Program& ShaderProgram(void);
-		void Render(GLenum mode);
+		Layer3D(float fov, float aspect, float near, float far)
+			: m_projectionMatrix(glm::perspective(fov, aspect, near, far)),
+			m_renderer(8192)
+		{
+		}
+
+		void Init(void)
+		{
+			m_renderer.InitBuffer();
+		}
+
+		void BindRenderable(uint32_t index)
+		{
+			m_renderer.Bind(m_objects[index]);
+		}
+
+		void PushObject(Renderable3D* object)
+		{
+			m_objects.push_back(object);
+		}
+
+		BatchRenderer3D& Renderer(void)
+		{
+			return m_renderer;
+		}
+
+		::gl::Program& ShaderProgram(void)
+		{
+			return m_program;
+		}
+
+		glm::mat4& ProjectionMatrix(void)
+		{
+			return m_projectionMatrix;
+		}
 	private:
 		std::vector<Renderable3D*> m_objects;
 		::gl::Program m_program;
-		Renderer3D m_renderer;
+		BatchRenderer3D m_renderer;
 
 		glm::mat4 m_projectionMatrix;
 	};

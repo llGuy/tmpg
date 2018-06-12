@@ -21,7 +21,7 @@ namespace tmpg {
 			return nullptr;
 		}
 	public:
-		const ::gl::VertexArray& ModelVAO(void) const override
+		::gl::VertexArray& ModelVAO(void) override
 		{
 			return m_vao;
 		}

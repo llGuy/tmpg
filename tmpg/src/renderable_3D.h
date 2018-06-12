@@ -13,7 +13,10 @@ namespace tmpg {
 	class Renderable3D
 	{
 	public:
-		Renderable3D(void) = default;
+		Renderable3D(void)
+			: m_vaoCount(0)
+		{
+		}
 		virtual ~Renderable3D(void) 
 		{
 		}
@@ -30,7 +33,7 @@ namespace tmpg {
 		}
 		virtual glm::vec3* Vertex(uint32_t index) = 0;
 	public:
-		virtual const ::gl::VertexArray& ModelVAO(void) const
+		virtual ::gl::VertexArray& ModelVAO(void) 
 		{
 			return m_vao;
 		}
@@ -38,9 +41,14 @@ namespace tmpg {
 		{
 			return m_buffer;
 		}
+		uint32_t& VAOCount(void)
+		{
+			return m_vaoCount;
+		}
 	protected:
 		::gl::VertexArray m_vao;
 		::gl::Buffer m_buffer;
+		uint32_t m_vaoCount;
 	};
 
 }

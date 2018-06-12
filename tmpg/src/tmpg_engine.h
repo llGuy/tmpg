@@ -3,6 +3,7 @@
 
 #include "entities_handler.h"
 #include "physics_handler.h"
+#include "batch_renderer.h"
 #include "input_handler.h"
 #include "renderer_3D.h"
 #include "layer_3D.h"
@@ -36,8 +37,9 @@ namespace tmpg {
 		void Configure(void);
 	private:
 		// render
-		void RenderBullets(void);
-		void RenderPlayers(void);
+		void PushBulletsRenderer(void);
+		void PushPlayersRenderer(void);
+		void RenderEntities(void);
 		void RenderPlatforms(void);
 		void CheckMouseUpdates(void);
 		void CheckKeyboardUpdates(float);

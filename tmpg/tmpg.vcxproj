@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\batch_renderer.cpp" />
     <ClCompile Include="src\bullet.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\entities_handler.cpp" />
@@ -135,7 +136,6 @@
     <ClCompile Include="src\entity_model_3D.cpp" />
     <ClCompile Include="src\input_handler.cpp" />
     <ClCompile Include="src\timer.cpp" />
-    <ClCompile Include="src\layer_3D.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\physics_handler.cpp" />
     <ClCompile Include="src\platform.cpp" />
@@ -147,6 +147,7 @@
     <ClCompile Include="src\window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\batch_renderer.h" />
     <ClInclude Include="src\buffer.h" />
     <ClInclude Include="src\bullet.h" />
     <ClInclude Include="src\camera.h" />
@@ -173,9 +174,9 @@
     <ClInclude Include="src\window.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\scene\vsh.shader" />
     <None Include="res\scene\fsh.shader" />
     <None Include="res\scene\gsh.shader" />
-    <None Include="res\scene\vsh.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -124,8 +124,9 @@ namespace tmpg {
 		{
 			m_vao.Bind();
 			m_buffer.Bind(GL_ARRAY_BUFFER);
-			m_vao.Enable(0);
-			m_vao.VAPtr(0, 3, GL_FLOAT, 3 * sizeof(float), nullptr);
+			m_vao.Enable(m_vaoCount);
+			m_vao.VAPtr(m_vaoCount, 3, GL_FLOAT, 3 * sizeof(float), nullptr);
+			m_vaoCount++;
 		}
 	private:
 		std::array<glm::vec3, VERTX * VERTZ> m_vertices;
