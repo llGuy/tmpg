@@ -16,15 +16,10 @@ namespace tmpg {
 	public:
 		~Layer3D(void) = default;
 
-		Layer3D(float fov, float aspect, float near, float far)
-			: m_projectionMatrix(glm::perspective(fov, aspect, near, far)),
+		Layer3D(const glm::mat4& projection)
+			: m_projectionMatrix(projection),
 			m_renderer(8192)
 		{
-		}
-
-		void Init(void)
-		{
-			m_renderer.InitBuffer();
 		}
 
 		void BindRenderable(uint32_t index)

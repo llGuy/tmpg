@@ -69,6 +69,9 @@
     <ClCompile Include="src\batch_renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\shadow_framebuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\window.h">
@@ -146,10 +149,15 @@
     <ClInclude Include="src\batch_renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\shadow_framebuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\scene\gsh.shader" />
     <None Include="res\scene\fsh.shader" />
     <None Include="res\scene\vsh.shader" />
+    <None Include="res\scene\shadow\vsh.shader" />
+    <None Include="res\scene\shadow\fsh.shader" />
   </ItemGroup>
 </Project>

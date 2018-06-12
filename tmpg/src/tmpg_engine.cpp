@@ -4,7 +4,7 @@ namespace tmpg {
 
 	TMPGEng::TMPGEng(void)
 		: m_win("the multiplayer game", DISPLAY_WIDTH, DISPLAY_HEIGHT),
-		m_sceneLayer(glm::radians(60.0f), (float)DISPLAY_WIDTH / DISPLAY_HEIGHT, 0.01f, 1000.0f)
+		m_sceneLayer(glm::perspective(glm::radians(60.0f), (float)DISPLAY_WIDTH / DISPLAY_HEIGHT, 0.01f, 1000.0f))
 	{
 	}
 
@@ -121,7 +121,6 @@ namespace tmpg {
 
 	void TMPGEng::InitLayers(void)
 	{
-		m_sceneLayer.Init();
 		m_sceneLayer.PushObject(m_platform.Mesh());
 		m_sceneLayer.PushObject(m_entitiesHandler.Model3D());
 
@@ -129,9 +128,10 @@ namespace tmpg {
 		decltype(auto) renderer = m_sceneLayer.Renderer();
 		for (uint32_t i = 0; i < 2; ++i)
 		{
+			renderer.PushBuffer();
 			m_sceneLayer.BindRenderable(i);
-			renderer.PrepareMatrixAttribute();
-			renderer.EmptyBuffer();
+			renderer.PrepareMatrixAttribute(i);
+			renderer.EmptyBuffer(i);
 		}
 
 		decltype(auto) program = m_sceneLayer.ShaderProgram();
@@ -162,7 +162,7 @@ namespace tmpg {
 			glm::mat4 rotation = glm::rotate(bullet.Angle(m_timer.Elapsed()), r);
 			glm::mat4 modelMatrix = glm::translate(bullet.Position()) * rotation * scale;
 
-			renderer.PushMatrix(&modelMatrix[0][0]);
+			renderer.PushMatrix(&modelMatrix[0][0], 1);
 		}
 	}
 	
@@ -182,7 +182,7 @@ namespace tmpg {
 				glm::vec3 angle = m_entitiesHandler[i].Angle();
 				glm::mat4 model = translation * glm::rotate(angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
 
-				renderer.PushMatrix(&model[0][0]);
+				renderer.PushMatrix(&model[0][0], 1);
 			}
 		}
 	}
@@ -203,8 +203,8 @@ namespace tmpg {
 		program.Uniform3f(&sunPosition[0], 3);
 
 		decltype(auto) batchRenderer = m_sceneLayer.Renderer();
-		batchRenderer.RenderElementsInstanced(GL_TRIANGLES);
-		batchRenderer.EmptyBuffer();
+		batchRenderer.RenderElementsInstanced(GL_TRIANGLES, 1);
+		batchRenderer.EmptyBuffer(1);
 	}
 
 	void TMPGEng::RenderPlatforms(void)
@@ -228,9 +228,9 @@ namespace tmpg {
 		program.UniformMat4(&projection[0][0], 2);
 		program.Uniform3f(&sunPosition[0], 3);
 
-		renderer.PushMatrix(&translation[0][0]);
-		renderer.RenderElementsInstanced(GL_TRIANGLES);
-		renderer.EmptyBuffer();
+		renderer.PushMatrix(&translation[0][0], 0);
+		renderer.RenderElementsInstanced(GL_TRIANGLES, 0);
+		renderer.EmptyBuffer(0);
 	}
 
 }

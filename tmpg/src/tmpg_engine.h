@@ -13,8 +13,8 @@
 #include "window.h"
 #include "timer.h"
 
-#define DISPLAY_WIDTH 2600
-#define DISPLAY_HEIGHT 1200
+#define DISPLAY_WIDTH 1400
+#define DISPLAY_HEIGHT 900
 
 namespace tmpg {
 

@@ -61,7 +61,7 @@ namespace tmpg {
 	glm::vec3 Player::Angle(void)
 	{
 		glm::vec3 angles = m_direction;
-		float x = asin(angles.x);
+		float x = -atan(angles.z / angles.x);
 		angles.y = x;
 		return glm::vec3(0.0f, angles.y, 0.0f);
 	}
