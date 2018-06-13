@@ -69,9 +69,6 @@
     <ClCompile Include="src\batch_renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\shadow_framebuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\window.h">
@@ -149,7 +146,7 @@
     <ClInclude Include="src\batch_renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\shadow_framebuffer.h">
+    <ClInclude Include="src\platform_shield.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

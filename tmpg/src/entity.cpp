@@ -5,12 +5,12 @@ namespace tmpg {
 	Entity::Entity(const glm::vec3& p, const glm::vec3& d, uint32_t id,
 		float speed, float height)
 		: m_position(p), m_direction(d), m_id(id), m_speed(speed), m_height(height),
-		m_terraforming(-1)
+		m_terraforming(-1), m_protected(-1)
 	{
 	}
 
 	Entity::Entity(const glm::vec3& p, const glm::vec3& d, float speed)
-		: m_position(p), m_direction(d), m_speed(speed)
+		: m_position(p), m_direction(d), m_speed(speed), m_protected(-1)
 	{
 	}
 
@@ -70,6 +70,11 @@ namespace tmpg {
 	float& Entity::GroundHeight(void)
 	{
 		return m_groundHeight;
+	}
+
+	int32_t& Entity::Protected(void)
+	{
+		return m_protected;
 	}
 
 }

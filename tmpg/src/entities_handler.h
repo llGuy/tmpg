@@ -9,7 +9,6 @@
 #include "camera.h"
 #include "player.h"
 #include "program.h"
-#include "platform.h"
 #include "entity_model_3D.h"
 
 // bullet model radius is entity model radius * 0.2f
@@ -17,6 +16,8 @@
 #define BULLET_MODEL_RADIUS ENTITY_MODEL_RADIUS * 0.2f
 
 namespace tmpg {
+
+	class Platform;
 
 	class EntitiesHandler
 	{

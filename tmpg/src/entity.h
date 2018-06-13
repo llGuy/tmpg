@@ -24,6 +24,7 @@ namespace tmpg {
 		glm::vec3 EyePosition(void) const;
 		// entities can terraform
 		int32_t& Terraforming(void);
+		int32_t& Protected(void);
 		glm::vec3& Direction(void);
 		glm::vec3& Position(void);
 		float& GroundHeight(void);
@@ -37,6 +38,7 @@ namespace tmpg {
 		float m_height;
 		float m_groundHeight;
 		int32_t m_terraforming;
+		int32_t m_protected;
 	};
 
 }

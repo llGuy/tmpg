@@ -48,6 +48,7 @@ namespace tmpg {
 
 		m_entitiesHandler.UpdateEntities(m_physicsHandler.Gravity(), elapsed, m_platform);
 		m_platform.UpdateForcePoints(elapsed);
+		m_platform.UpdateProtectionPoints(elapsed, m_entitiesHandler);
 
 		CheckMouseUpdates();
 		CheckKeyboardUpdates(elapsed);
@@ -88,6 +89,7 @@ namespace tmpg {
 		if (m_inputHandler.Key(GLFW_KEY_SPACE)) playerBoundByCamera.Move(JUMP, elapsed, m_physicsHandler.Gravity());
 		if (m_inputHandler.Key(GLFW_KEY_LEFT_SHIFT)) playerBoundByCamera.Move(DOWN, elapsed, m_physicsHandler.Gravity());
 		if (m_inputHandler.Key(GLFW_KEY_T)) m_entitiesHandler.ToggleThirdPerson();
+		if (m_inputHandler.Key(GLFW_KEY_C)) m_platform.HandleAction(SHIELD, playerBoundByCamera);
 	}
 
 	void TMPGEng::InitWin(void)

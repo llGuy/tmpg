@@ -3,7 +3,7 @@
 namespace tmpg {
 
 	Bullet::Bullet(const glm::vec3& p, const glm::vec3& d)
-		: Entity(p, d, 20.0f), m_resistance(3.0f), m_rotationIntensity(300.0f), m_angle(0.0f)
+		: Entity(p, d, 20.0f), m_resistance(3.0f), m_rotationIntensity(200.0f), m_angle(0.0f)
 	{
 		m_position += m_direction;
 	}

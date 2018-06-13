@@ -1,5 +1,6 @@
 #include "entities_handler.h"
 #include "utils.h"
+#include "platform.h"
 
 namespace tmpg {
 
@@ -84,7 +85,7 @@ namespace tmpg {
 
 	void EntitiesHandler::PushBullet(void)
 	{
-		if (m_bulletTimer.Elapsed() > 0.1f)
+		if (m_bulletTimer.Elapsed() > 0.175f)
 		{
 			Player& bound = PlayerBoundByCamera();
 			m_bullets.emplace_back(bound.EyePosition(), bound.Direction());

@@ -1,4 +1,8 @@
 #include "platform.h"
+#include "entities_handler.h"
+
+#include <glm/gtx/string_cast.hpp>
+#include <stdio.h>
 
 namespace {
 
@@ -142,6 +146,63 @@ namespace tmpg {
 		updateQuarter(-1, -1, false, true);
 	}
 
+	void Platform::UpdateProtectionPoints(float timedelta, EntitiesHandler& ehandler)
+	{
+		if (m_protectionPoints.size() > 0)
+		{
+			for (uint32_t i = 0; i < m_protectionPoints.size(); ++i)
+			{
+				UpdatePP(i, timedelta, ehandler);
+			}
+			m_mesh->Update();
+		}
+		else m_ppTimer.Reset();
+	}
+
+	void Platform::UpdatePP(uint32_t i, float timedelta, EntitiesHandler& ehandler)
+	{
+		ProtectionPoint& point = m_protectionPoints[i].pp;
+
+		auto updateQuarter = [&](int32_t quotx, int32_t quotz, bool updateCenter) -> void
+		{
+			for (uint32_t shieldIndex = 0; shieldIndex < m_shield.Size(); ++shieldIndex)
+			{
+				auto pp = m_shield.At(shieldIndex, point.position, quotx, quotz);
+
+				bool updateVertex = true;
+				//if (!updateCenter)
+					//updateVertex &= !(pp.position.x == point.position.x || pp.position.y == point.position.y);
+				if (updateVertex)
+				{
+					auto vertex = At(pp.position.x, pp.position.y);
+					if (vertex.has_value())
+					{
+						glm::vec3& v = *vertex.value();
+
+						float newHeight = v.y + pp.quotient * point.intensity * timedelta;
+						if (v.y < newHeight)
+							v.y += pp.quotient * point.intensity * timedelta;
+					}
+				}
+			}
+		};
+
+		float timeElapsed = m_ppTimer.Elapsed();
+		// erase protection point if it lasted for over half a second
+		if (timeElapsed - point.start > 0.5f)
+		{
+			ehandler[m_protectionPoints[i].entityID].Protected() = -1;
+			m_protectionPoints.erase(m_protectionPoints.begin() + i);
+		}
+		else
+		{
+			updateQuarter(1, 1, true);
+			updateQuarter(1, -1, true);
+			updateQuarter(-1, 1, true);
+			updateQuarter(-1, -1, true);
+		}
+	}
+
 	void Platform::HandleAction(action_t action, Entity& entity)
 	{
 		using maths::Ray;
@@ -174,6 +235,15 @@ namespace tmpg {
 			{
 				m_forcePoints.erase(m_forcePoints.begin() + entity.Terraforming());
 				entity.Terraforming() = -1;
+			}
+			break;
+		case action_t::SHIELD:
+			if (entity.Protected() == -1)
+			{
+				glm::vec2 position = glm::vec2(glm::round(entity.Position().x), glm::round(entity.Position().z));
+				entity.Protected() = m_protectionPoints.size();
+				glm::ivec2 meshSpace = WorldtoMeshSpace(position);
+				m_protectionPoints.push_back({ ProtectionPoint(meshSpace, 20.0f, m_ppTimer.Elapsed()), entity.ID() });
 			}
 			break;
 		}
