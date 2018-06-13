@@ -102,10 +102,6 @@ namespace tmpg {
 				}
 			}
 		}
-		void GenerateColors(void)
-		{
-			std::fill(m_colors.begin(), m_colors.end(), glm::vec3(0.3f, 0.3f, 0.3f));
-		}
 	private:
 		void CreateVIBuffer(void)
 		{
@@ -115,10 +111,6 @@ namespace tmpg {
 			m_buffer.Fill<void>(VERTICES_SIZE_BYTES + INDICES_SIZE_BYTES, nullptr, GL_DYNAMIC_DRAW, GL_ARRAY_BUFFER);
 			m_buffer.PartialFill(0, VERTICES_SIZE_BYTES, m_vertices.data(), GL_ARRAY_BUFFER);
 			m_buffer.PartialFill(VERTICES_SIZE_BYTES, INDICES_SIZE_BYTES, m_indices.data(), GL_ELEMENT_ARRAY_BUFFER);
-		}
-		void CreateColorBuffer(void)
-		{
-			m_colorBuffer.Fill(m_colors.size(), m_colors.data(), GL_DYNAMIC_DRAW, GL_ARRAY_BUFFER);
 		}
 		void CreateVAO(void)
 		{
