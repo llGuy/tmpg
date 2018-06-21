@@ -3,7 +3,7 @@
 namespace tmpg {
 
 	Camera::Camera(void)
-		: m_angles(60.0f, 60.0f), m_distance(5.0f)
+	    : m_angles(60.0f, 60.0f), m_distance(5.0f), m_thirdPerson(false)
 	{
 	}
 

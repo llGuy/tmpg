@@ -16,7 +16,7 @@ namespace tmpg {
 		BatchRenderer3D(uint32_t bufferMaxSize);
 
 		void EmptyBuffer(uint32_t index);
-
+	    
 		void PushMatrix(float* data, uint32_t index);
 		void PrepareMatrixAttribute(uint32_t index);
 		void Bind(Renderable3D* renderable);
