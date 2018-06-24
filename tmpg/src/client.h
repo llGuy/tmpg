@@ -4,7 +4,6 @@
 #include <thread>
 #include <memory>
 #include "net_handler.h"
-#include "entities_handler.h"
 
 namespace net {
 
@@ -12,16 +11,25 @@ namespace net {
 	: public NetworkHandler
     {
     public:
-	Client(tmpg::EntitiesHandler*);
+	Client(void) = default;
 
-	void Launch(const std::string& address, const std::string& port) override;
+	void Launch(const std::string& address, const std::string& port,
+	    tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih) override;
     private:
-	void UDPThread(void);
-	void TCPThread(void);
+	void UDPThread(tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih);
+	void TCPThread(tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih);
 
 	std::string ReceiveUsername(void);
+
+	template<typename _Ty>
+	_Ty Flags(bool* bytes, uint32_t size)
+	{
+	    _Ty flags = (_Ty)0;
+	    for(uint32_t i = 0; i < sizeof(bytes) / sizeof(int8_t); ++i)
+		flags += bytes[i] << bytes[i];
+	    return flags;
+	}
     private:
-	tmpg::EntitiesHandler* m_ehandler;
 	std::unique_ptr<std::thread> m_TCPThread;
 	std::unique_ptr<std::thread> m_UDPThread;
     };

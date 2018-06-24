@@ -25,7 +25,7 @@ namespace net {
     {
 	int32_t err = connect(m_socket, m_ainfo->ai_addr, m_ainfo->ai_addrlen);
 	if(err < 0) std::cerr << "ERROR : unable to connect()" << std::endl;
-	else std::cout << "SUCCESS : connected socket to address";
+	else std::cout << "SUCCESS : connected socket to address" << std::endl;
     }
     
     void UnixSocket::Listen(int32_t max)

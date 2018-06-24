@@ -15,7 +15,7 @@ namespace tmpg {
 	class InputHandler
 	{
 	public:
-		InputHandler(void) = default;
+		InputHandler(void);
 
 		bool& Key(int32_t key);
 		bool CursorMoved(void);

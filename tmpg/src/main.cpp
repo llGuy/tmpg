@@ -5,7 +5,10 @@ int32_t main(int32_t argc, char* argv[])
 {
 	using namespace tmpg;
 
-	TMPGEng engine;
+	TMPGEng engine(argc, argv);
+
+	// connect to some server for game
+	engine.InitConnection();
 
 	GLFWInit();
 	engine.InitWin();
