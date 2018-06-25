@@ -1,15 +1,11 @@
 #ifndef _PACKET_PARSER_H_
 #define _PACKET_PARSER_H_
 
+#include "packet_delimiter.h"
+
 namespace net {
 
     using Byte = uint8_t;
-
-    enum
-    : int8_t
-    {
-	CHAR_DELIMITER = '#'
-    };
     
     class PacketParser
     {

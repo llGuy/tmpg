@@ -3,6 +3,7 @@
 
 #include <thread>
 #include <memory>
+#include "physics_handler.h"
 #include "net_handler.h"
 
 namespace net {
@@ -14,10 +15,10 @@ namespace net {
 	Client(void) = default;
 
 	void Launch(const std::string& address, const std::string& port,
-	    tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih) override;
+		    tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph) override;
     private:
-	void UDPThread(tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih);
-	void TCPThread(tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih);
+	void UDPThread(tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph);
+	void TCPThread(tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph);
 
 	std::string ReceiveUsername(void);
 
@@ -26,12 +27,18 @@ namespace net {
 	{
 	    _Ty flags = (_Ty)0;
 	    for(uint32_t i = 0; i < sizeof(bytes) / sizeof(int8_t); ++i)
-		flags += bytes[i] << bytes[i];
+	    {
+		bool flag = bytes[i];
+		flags += flag << i;
+	    }
 	    return flags;
 	}
     private:
 	std::unique_ptr<std::thread> m_TCPThread;
 	std::unique_ptr<std::thread> m_UDPThread;
+
+	// client id that the server uses to map clients' addresses
+	uint16_t m_clientID;
     };
 
 }

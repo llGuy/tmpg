@@ -5,7 +5,7 @@
 namespace tmpg {
 
     InputHandler::InputHandler(void)
-	: m_keyMap { 0 }, m_mouseButtonMap { 0 }
+	: m_keyMap { 0 }, m_mouseButtonMap { 0 }, m_windowResized(false)
     {
     }
 
@@ -45,6 +45,24 @@ namespace tmpg {
 	InputHandler* inputHandler = (InputHandler*)glfwGetWindowUserPointer(win);
 	if (action == GLFW_PRESS) inputHandler->m_mouseButtonMap[button] = true;
 	else if (action == GLFW_RELEASE) inputHandler->m_mouseButtonMap[button] = false;
+    }
+
+    void InputHandler::HandleWindowResize(GLFWwindow* win, int32_t width, int32_t height)
+    {
+	InputHandler* inputHandler = (InputHandler*)glfwGetWindowUserPointer(win);
+	inputHandler->m_width = width;
+	inputHandler->m_height = height;
+	inputHandler->Resized() = true;
+    }
+
+    bool& InputHandler::Resized(void)
+    {
+	return m_windowResized;
+    }
+
+    const glm::vec2 InputHandler::WindowSize(void)
+    {
+	return glm::vec2(static_cast<float>(m_width), static_cast<float>(m_height));
     }
 
     const glm::vec2& InputHandler::CursorPosition(void)

@@ -1,15 +1,11 @@
 #ifndef _PACKET_ENCODER_H_
 #define _PACKET_ENCODER_H_
 
+#include "packet_delimiter.h"
 #include <iostream>
 #include <vector>
 
 namespace net {
-
-    enum delimiter_t
-    {
-	CHAR_DELIMITER = '#'
-    };
     
     using Byte = uint8_t;
 

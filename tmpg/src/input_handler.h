@@ -11,28 +11,36 @@
 
 namespace tmpg {
 
-	// handles key input AND mouse input
-	class InputHandler
-	{
-	public:
-		InputHandler(void);
+    // handles key input AND mouse input
+    class InputHandler
+    {
+    public:
+	InputHandler(void);
 
-		bool& Key(int32_t key);
-		bool CursorMoved(void);
-		bool& MouseButton(int32_t mouseButton);
-		const glm::vec2& CursorPosition(void);
-	public:
-		static void HandleKeyInput(GLFWwindow* win, int key, int scancode, int action, int mods);
-		static void HandleMouseMovement(GLFWwindow* win, double x, double y);
-		static void HandleMouseInput(GLFWwindow* win, int button, int action, int mods);
-	private:
-		std::array<bool, MAX_KEYS> m_keyMap;
-		std::array<bool, MAX_MOUSE_BUTTONS> m_mouseButtonMap;
+	bool& Key(int32_t key);
+	bool& Resized(void);
+	bool CursorMoved(void);
+	bool& MouseButton(int32_t mouseButton);
+	const glm::vec2& CursorPosition(void);
 
-		glm::vec2 m_currentCursorPosition;
-		// if cursor did not move, do not calculate entity new direction
-		bool m_cursorMoved;
-	};
+	const glm::vec2 WindowSize(void);
+    public:
+	static void HandleWindowResize(GLFWwindow* win, int32_t width, int32_t height);
+	static void HandleKeyInput(GLFWwindow* win, int key, int scancode, int action, int mods);
+	static void HandleMouseMovement(GLFWwindow* win, double x, double y);
+	static void HandleMouseInput(GLFWwindow* win, int button, int action, int mods);
+    private:
+	std::array<bool, MAX_KEYS> m_keyMap;
+	std::array<bool, MAX_MOUSE_BUTTONS> m_mouseButtonMap;
+
+	glm::vec2 m_currentCursorPosition;
+	// if cursor did not move, do not calculate entity new direction
+	bool m_cursorMoved;
+	bool m_windowResized;
+
+	int32_t m_width;
+	int32_t m_height;
+    };
 
 }
 

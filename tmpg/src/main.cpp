@@ -7,14 +7,15 @@ int32_t main(int32_t argc, char* argv[])
 
 	TMPGEng engine(argc, argv);
 
-	// connect to some server for game
-	engine.InitConnection();
-
 	GLFWInit();
 	engine.InitWin();
 	GLEWInit();
 
 	engine.InitData();
+	// need to initialize connection after the engine data is initialized
+	// because the client or server may need to use the data 
+	// connect to some server for game
+	engine.InitConnection();
 
 	while (engine.Running())
 	{

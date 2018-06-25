@@ -1,4 +1,5 @@
 #include "tmpg_engine.h"
+#include <glm/gtx/string_cast.hpp>
 
 namespace tmpg {
 
@@ -47,7 +48,7 @@ namespace tmpg {
 
     void TMPGEng::InitConnection(void)
     {
-	m_networkHandler->Launch("192.168.1.230", "5000", m_entitiesHandler, m_inputHandler);
+	m_networkHandler->Launch("192.168.1.230", "5000", m_entitiesHandler, m_inputHandler, m_physicsHandler);
     }
 
     void TMPGEng::UpdateData(void)
@@ -60,6 +61,7 @@ namespace tmpg {
 
 	CheckMouseUpdates();
 	CheckKeyboardUpdates(elapsed);
+	CheckWindowResize();
 
 	m_timer.Reset();
     }
@@ -86,7 +88,6 @@ namespace tmpg {
 	if (m_inputHandler.MouseButton(GLFW_MOUSE_BUTTON_2))
 	{
 	    m_platform.HandleAction(START_TERRAFORMING, player);
-	    std::cout << "terraforming" << std::endl;
 	}
 	else m_platform.HandleAction(END_TERRAFORMING, player);
     }
@@ -104,6 +105,19 @@ namespace tmpg {
 	if (m_inputHandler.Key(GLFW_KEY_C)) m_platform.HandleAction(SHIELD, playerBoundByCamera);
     }
 
+    void TMPGEng::CheckWindowResize(void)
+    {
+	auto& resized = m_inputHandler.Resized();
+	if(resized)
+	{
+	    auto dimensions = m_inputHandler.WindowSize();
+	    std::cout << glm::to_string(dimensions) << std::endl;
+	    glViewport(0, 0, dimensions.x, dimensions.y);
+	     m_sceneLayer.ProjectionMatrix() = glm::perspective(glm::radians(60.0f), dimensions.x / dimensions.y, 0.01f, 1000.0f);
+	    resized = false;
+	}
+    }
+
     void TMPGEng::InitWin(void)
     {
 	m_win.WindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -116,6 +130,7 @@ namespace tmpg {
 	m_win.KeyCallback(InputHandler::HandleKeyInput);
 	m_win.MouseButtonCallback(InputHandler::HandleMouseInput);
 	m_win.CursorMovementCallback(InputHandler::HandleMouseMovement);
+	m_win.WindowResizeCallback(InputHandler::HandleWindowResize);
 	m_win.InputMode(GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 

@@ -48,6 +48,7 @@ namespace tmpg {
 	void RenderPlatforms(void);
 	void CheckMouseUpdates(void);
 	void CheckKeyboardUpdates(float);
+	void CheckWindowResize(void);
     private:
 	Window m_win;
 	Timer m_timer;

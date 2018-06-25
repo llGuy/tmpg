@@ -12,6 +12,11 @@ namespace tmpg {
 
     class EntitiesHandler;
     class InputHandler;
+    
+    namespace physics
+    {
+	class PhysicsHandler;
+    }
 
 }
 
@@ -24,7 +29,7 @@ namespace net {
 	virtual ~NetworkHandler(void) {}
 
 	virtual void Launch(const std::string& address, const std::string& port,
-			    tmpg::EntitiesHandler&, tmpg::InputHandler&) = 0;
+			    tmpg::EntitiesHandler&, tmpg::InputHandler&, tmpg::physics::PhysicsHandler& ph) = 0;
     protected:
 	// tmpg only supports unix for now
 	UnixSocket m_UDPSocket;
