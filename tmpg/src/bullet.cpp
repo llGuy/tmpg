@@ -1,26 +1,37 @@
 #include "bullet.h"
+#include <stdio.h>
+#include <iostream>
 
 namespace tmpg {
 
-	Bullet::Bullet(const glm::vec3& p, const glm::vec3& d)
-		: Entity(p, d, 20.0f), m_resistance(3.0f), m_rotationIntensity(200.0f), m_angle(0.0f)
-	{
-		m_position += m_direction;
-	}
+    Bullet::Bullet(const glm::vec3& p, const glm::vec3& d)
+	: Entity(p, d, 30.0f), m_resistance(1.0f), m_rotationIntensity(200.0f), m_angle(0.0f), m_static(false)
+    {
+	m_position += m_direction;
+    }
 
-	void Bullet::Update(float gravity, float time, float groundHeight)
+    void Bullet::Update(float gravity, float time, float groundHeight)
+    {
+	if(!m_static)
 	{
-		// update position
-		m_position += m_direction * m_speed * time;
-		m_direction.y += gravity * time * 0.1f;
-		m_speed -= m_resistance * time;
+	    // update position
+	    m_position += m_direction * m_speed * time;
+	    m_direction.y += gravity * time * 0.1f;
 	}
+    }
 
-	float Bullet::Angle(float time) 
-	{
-		m_angle += time * m_rotationIntensity;
-		if (m_angle > 360.0f) m_angle = 0.0f;
-		return m_angle;
-	}
+    float Bullet::Angle(float time) 
+    {
+	if(m_static) return m_angle;
+
+	m_angle += time * m_rotationIntensity;
+	if (m_angle > 360.0f) m_angle = 0.0f;
+	return m_angle;
+    }
+
+    bool& Bullet::Static(void)
+    {
+	return m_static;
+    }
 
 }

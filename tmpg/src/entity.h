@@ -28,6 +28,7 @@ namespace tmpg {
 	glm::vec3& Direction(void);
 	glm::vec3& Position(void);
 	float& GroundHeight(void);
+	float& Speed(void);
 	float Height(void);
 	uint32_t ID(void);
     protected:

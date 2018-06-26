@@ -15,6 +15,12 @@ namespace tmpg {
 
 namespace net {
 
+    struct ClientData
+    {
+	ClientAddr address;
+	uint32_t entityIndex;
+    };
+    
     class Server
 	: public NetworkHandler
     {
@@ -29,14 +35,14 @@ namespace net {
 	void TCPThread(UnixSocket socket, tmpg::EntitiesHandler& eh,
 		       tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph); // take socket by copy
 	void TCPAcceptThread(tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph);
-	uint16_t ParseUDPMessage(Byte* data, uint32_t size, tmpg::Entity& player, float gravity) const;
+	uint16_t ParseUDPMessage(Byte* data, uint32_t size, float gravity) const;
     private:
 	static constexpr uint32_t MAX_PENDING = 10;
 	
 	tmpg::EntitiesHandler* m_ehandler;
 	std::unique_ptr<std::thread> m_TCPAcceptThread;
 	std::vector<std::thread> m_TCPCommunicationThreads;
-	std::unordered_map<uint16_t, ClientAddr> m_addresses;
+	std::unordered_map<uint16_t, ClientData> m_addresses;
     };
 
 }

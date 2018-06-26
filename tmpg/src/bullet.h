@@ -5,21 +5,25 @@
 
 namespace tmpg {
 
-	class Bullet
-		: public Entity
-	{
-	public:
-		Bullet(const glm::vec3&, const glm::vec3& dir);
+    class Bullet
+	: public Entity
+    {
+    public:
+	Bullet(const glm::vec3&, const glm::vec3& dir);
 
-		void Update(float gravity, float time, float groundHeight) override;
-		float Angle(float);
-	private:
-		float m_resistance;
+	void Update(float gravity, float time, float groundHeight) override;
+	float Angle(float);
 
-		// throwing the bullets, they turn
-		float m_angle;
-		float m_rotationIntensity;
-	};
+	bool& Static(void);
+    private:
+	float m_resistance;
+
+	// throwing the bullets, they turn
+	float m_angle;
+	float m_rotationIntensity;
+
+	bool m_static;
+    };
 
 }
 

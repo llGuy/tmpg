@@ -40,10 +40,10 @@ namespace net {
 	    keyFlags[i] = (flags >> i) & 0b00000001;
 	}
 	
-	if(keyFlags[0]) /* W */ player.Move(tmpg::FORWARD, 0.03f, gravity);
-	if(keyFlags[1]) /* A */ player.Move(tmpg::LEFT, 0.03f, gravity);
-	if(keyFlags[2]) /* S */ player.Move(tmpg::BACKWARD, 0.03f, gravity);
-	if(keyFlags[3]) /* D */ player.Move(tmpg::RIGHT, 0.03f, gravity);
+	//if(keyFlags[0]) /* W */ player.Move(tmpg::FORWARD, 0.03f, gravity);
+	//if(keyFlags[1]) /* A */ player.Move(tmpg::LEFT, 0.03f, gravity);
+	//if(keyFlags[2]) /* S */ player.Move(tmpg::BACKWARD, 0.03f, gravity);
+	//if(keyFlags[3]) /* D */ player.Move(tmpg::RIGHT, 0.03f, gravity);
 
 	return playerID;
     }

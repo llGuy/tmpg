@@ -2,150 +2,172 @@
 #include "utils.h"
 #include "platform.h"
 
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/vector_angle.hpp>
+
 namespace tmpg {
 
-	EntitiesHandler::EntitiesHandler(void)
+    EntitiesHandler::EntitiesHandler(void)
+    {
+    }
+
+    void EntitiesHandler::Init(void)
+    {
+	m_payerModel = new EntityModel3D(ENTITY_MODEL_RADIUS);
+	m_payerModel->GenerateData();
+	m_bulletTimer.Start();
+	m_toggleThirdPersonTimer.Start();
+    }
+
+    void EntitiesHandler::UpdateEntities(float gravity, float time, Platform& platform)
+    {
+	std::for_each(m_players.begin(), m_players.end(),
+		      [&](Player& player) -> void 
+		      { 
+			  decltype(auto) position = player.Position();
+			  player.Update(gravity, time, platform.HeightAtPoint(position.x, position.z).first); 
+		      });
+
+	std::for_each(m_bullets.begin(), m_bullets.end(),
+		      [&](Bullet& bullet) -> void
+		      {
+			  decltype(auto) position = bullet.Position();
+			  decltype(auto) pair = platform.HeightAtPoint(position.x, position.z);
+			  bullet.Update(gravity, time, pair.first); 
+			  /* ground height collision gets calculated separately */ });
+
+	uint32_t eliminatedBullets = 0;
+	for (uint32_t i = 0; i < m_bullets.size(); ++i)
 	{
+	    auto bcrv = QueryBulletCollision(platform, m_bullets[i]);
+	    if (std::get<bool>(bcrv))
+	    {
+		//m_bullets[i] = m_bullets[m_bullets.size() - eliminatedBullets - 1];
+		//eliminatedBullets++;
+	    }
+	}
+	for (uint32_t i = 0; i < eliminatedBullets; ++i)
+	{
+	    //m_bullets.pop_back();
 	}
 
-	void EntitiesHandler::Init(void)
+	m_camera.UpdateViewMatrix(PlayerBoundByCamera());
+    }
+
+    void EntitiesHandler::ToggleThirdPerson(void)
+    {
+	if (m_toggleThirdPersonTimer.Elapsed() > 0.1f)
 	{
-		m_payerModel = new EntityModel3D(ENTITY_MODEL_RADIUS);
-		m_payerModel->GenerateData();
-		m_bulletTimer.Start();
-		m_toggleThirdPersonTimer.Start();
+	    m_camera.ToggleFirstThirdPerson();
+	    m_toggleThirdPersonTimer.Reset();
+	}
+    }
+
+    EntitiesHandler::BulletCollisionRV EntitiesHandler::QueryBulletCollision(Platform& platform, Bullet& bullet)
+    {
+	// if bullet hit the terrain
+	auto platformHeight = platform.HeightAtPoint(bullet.Position().x, bullet.Position().z);
+	if (utils::Equf(platformHeight.first, bullet.Position().y) || platformHeight.first > bullet.Position().y)
+	{
+	    if(bullet.Speed() < 2.0f)
+	    {
+		bullet.Static() = true;
+	    }
+	    else
+	    {
+		// so that next time entities handler checks collisions, speed isnt halved again
+		bullet.Direction() = glm::reflect(bullet.Direction(), platformHeight.second); // testing
+	        bullet.Position().y = platformHeight.first;
+		bullet.Position() += bullet.Direction() * 0.1f;
+//		if(glm::angle(bullet.Direction(), platformHeight.second) > glm::radians(45.0f)) bullet.Static() = true;
+		bullet.Speed() *= 0.4f;
+	    }
+	    return std::make_tuple<bool, std::optional<uint32_t>>(true, std::optional<uint32_t>{ /* empty */ });
 	}
 
-	void EntitiesHandler::UpdateEntities(float gravity, float time, Platform& platform)
+	uint32_t playerIndex = 0;
+	for (; playerIndex < m_players.size(); ++playerIndex)
 	{
-		std::for_each(m_players.begin(), m_players.end(),
-			[&](Player& player) -> void 
-		{ 
-			decltype(auto) position = player.Position();
-			player.Update(gravity, time, platform.HeightAtPoint(position.x, position.z)); 
-		});
-
-		std::for_each(m_bullets.begin(), m_bullets.end(),
-			[&](Bullet& bullet) -> void { bullet.Update(gravity, time, 0.0f); 
-		/* ground height collision gets calculated separately */ });
-
-		uint32_t eliminatedBullets = 0;
-		for (uint32_t i = 0; i < m_bullets.size(); ++i)
-		{
-			auto bcrv = QueryBulletCollision(platform, m_bullets[i]);
-			if (std::get<bool>(bcrv))
-			{
-				m_bullets[i] = m_bullets[m_bullets.size() - eliminatedBullets - 1];
-				eliminatedBullets++;
-			}
-		}
-		for (uint32_t i = 0; i < eliminatedBullets; ++i)
-		{
-			m_bullets.pop_back();
-		}
-
-		m_camera.UpdateViewMatrix(PlayerBoundByCamera());
+	    float distance = glm::distance(bullet.Position(), m_players[playerIndex].EyePosition());
+	    if (distance < BULLET_MODEL_RADIUS + ENTITY_MODEL_RADIUS)
+		return std::make_tuple<bool, std::optional<uint32_t>>(true, std::optional<uint32_t>(playerIndex));
 	}
+	return std::make_tuple<bool, std::optional<uint32_t>>(false, std::optional<uint32_t>());
+    }
 
-	void EntitiesHandler::ToggleThirdPerson(void)
+    void EntitiesHandler::BindCamera(uint32_t index)
+    {
+	m_camera.Bind(index);
+    }
+
+    void EntitiesHandler::PushPlayer(const glm::vec3& p, const glm::vec3& d)
+    {
+	m_players.emplace_back(p, d, m_players.size());
+    }
+
+    void EntitiesHandler::PushBullet(void)
+    {
+	if (m_bulletTimer.Elapsed() > 0.175f)
 	{
-		if (m_toggleThirdPersonTimer.Elapsed() > 0.1f)
-		{
-			m_camera.ToggleFirstThirdPerson();
-			m_toggleThirdPersonTimer.Reset();
-		}
+	    Player& bound = PlayerBoundByCamera();
+	    m_bullets.emplace_back(bound.EyePosition(), bound.Direction());
+	    m_bulletTimer.Reset();
 	}
+    }
 
-	EntitiesHandler::BulletCollisionRV EntitiesHandler::QueryBulletCollision(Platform& platform, Bullet& bullet)
-	{
-		// if bullet hit the terrain
-		float platformHeight = platform.HeightAtPoint(bullet.Position().x, bullet.Position().z);
-		if (utils::Equf(platformHeight, bullet.Position().y) || platformHeight > bullet.Position().y)
-			return std::make_tuple<bool, std::optional<uint32_t>>(true, std::optional<uint32_t>{ /* empty */ });
+    Player& EntitiesHandler::operator[](uint32_t index)
+    {
+	return m_players[index];
+    }
 
-		uint32_t playerIndex = 0;
-		for (; playerIndex < m_players.size(); ++playerIndex)
-		{
-			float distance = glm::distance(bullet.Position(), m_players[playerIndex].EyePosition());
-			if (distance < BULLET_MODEL_RADIUS + ENTITY_MODEL_RADIUS)
-				return std::make_tuple<bool, std::optional<uint32_t>>(true, std::optional<uint32_t>(playerIndex));
-		}
-		return std::make_tuple<bool, std::optional<uint32_t>>(false, std::optional<uint32_t>());
-	}
+    Bullet& EntitiesHandler::BulletAt(uint32_t index)
+    {
+	return m_bullets[index];
+    }
 
-	void EntitiesHandler::BindCamera(uint32_t index)
-	{
-		m_camera.Bind(index);
-	}
+    Renderable3D* EntitiesHandler::Model3D(void)
+    {
+	return m_payerModel;
+    }
 
-	void EntitiesHandler::PushPlayer(const glm::vec3& p, const glm::vec3& d)
-	{
-		m_players.emplace_back(p, d, m_players.size());
-	}
+    uint32_t EntitiesHandler::NumPlayers(void) const
+    {
+	return m_players.size();
+    }
 
-	void EntitiesHandler::PushBullet(void)
-	{
-		if (m_bulletTimer.Elapsed() > 0.175f)
-		{
-			Player& bound = PlayerBoundByCamera();
-			m_bullets.emplace_back(bound.EyePosition(), bound.Direction());
-			m_bulletTimer.Reset();
-		}
-	}
+    uint32_t EntitiesHandler::NumBullets(void) const
+    {
+	return m_bullets.size();
+    }
 
-	Player& EntitiesHandler::operator[](uint32_t index)
-	{
-		return m_players[index];
-	}
+    Player& EntitiesHandler::PlayerBoundByCamera(void)
+    {
+	return m_players[m_camera.BoundEntity()];
+    }
 
-	Bullet& EntitiesHandler::BulletAt(uint32_t index)
-	{
-		return m_bullets[index];
-	}
+    glm::mat4& EntitiesHandler::CameraViewMatrix(void)
+    {
+	return m_camera.ViewMatrix();
+    }
 
-	Renderable3D* EntitiesHandler::Model3D(void)
-	{
-		return m_payerModel;
-	}
+    void EntitiesHandler::UpdateCameraDirection(const glm::vec2& cursorPosition, float sens)
+    {
+	m_camera.Look(PlayerBoundByCamera(), cursorPosition, sens);
+    }
 
-	uint32_t EntitiesHandler::NumPlayers(void) const
-	{
-		return m_players.size();
-	}
+    void EntitiesHandler::UpdateViewMatrix(void)
+    {
+	m_camera.UpdateViewMatrix(PlayerBoundByCamera());
+    }
 
-	uint32_t EntitiesHandler::NumBullets(void) const
-	{
-		return m_bullets.size();
-	}
+    void EntitiesHandler::UpdateCameraCursorPosition(const glm::vec2& p)
+    {
+	m_camera.UpdateCursorPosition(p);
+    }
 
-	Player& EntitiesHandler::PlayerBoundByCamera(void)
-	{
-		return m_players[m_camera.BoundEntity()];
-	}
-
-	glm::mat4& EntitiesHandler::CameraViewMatrix(void)
-	{
-		return m_camera.ViewMatrix();
-	}
-
-	void EntitiesHandler::UpdateCameraDirection(const glm::vec2& cursorPosition, float sens)
-	{
-		m_camera.Look(PlayerBoundByCamera(), cursorPosition, sens);
-	}
-
-	void EntitiesHandler::UpdateViewMatrix(void)
-	{
-		m_camera.UpdateViewMatrix(PlayerBoundByCamera());
-	}
-
-	void EntitiesHandler::UpdateCameraCursorPosition(const glm::vec2& p)
-	{
-		m_camera.UpdateCursorPosition(p);
-	}
-
-	bool EntitiesHandler::ThirdPerson(void)
-	{
-		return m_camera.ThirdPerson();
-	}
+    bool EntitiesHandler::ThirdPerson(void)
+    {
+	return m_camera.ThirdPerson();
+    }
 
 }

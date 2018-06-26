@@ -31,7 +31,7 @@ namespace tmpg {
     void TMPGEng::Render(void)
     {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClearColor(0.74902f, 0.847059f, 1.0f, 1.0f);
 
 	glEnable(GL_DEPTH_TEST);
 	RenderPlatforms();
@@ -185,8 +185,13 @@ namespace tmpg {
 	{
 	    Bullet& bullet = m_entitiesHandler.BulletAt(i);
 	    // get all necessary data for draw call
-	    glm::vec3 r = bullet.Direction();		r.z = -1.0f; r.y = 0.0f;
-	    glm::mat4 rotation = glm::rotate(bullet.Angle(m_timer.Elapsed()), r);
+	    glm::mat4 rotation = glm::mat4(1.0f);
+	    if(!bullet.Static())
+	    {
+		glm::vec3 r = bullet.Direction();		r.z = -1.0f; r.y = 0.0f;
+		rotation = glm::rotate(bullet.Angle(m_timer.Elapsed()), r);
+	    }
+	    else rotation = glm::rotate(bullet.Angle(0.0f), glm::vec3(0.0f, bullet.Position().x, 0.0f));
 	    glm::mat4 modelMatrix = glm::translate(bullet.Position()) * rotation * scale;
 
 	    renderer.PushMatrix(&modelMatrix[0][0], 1);
