@@ -14,7 +14,7 @@ namespace tmpg {
     {
     }
 
-    void Entity::Update(float gravity, float time, float groundHeight)
+    void Entity::Update(float gravity, float time, float groundHeight, glm::vec3 normal)
     {
 	
     }
@@ -31,7 +31,7 @@ namespace tmpg {
 	case RIGHT: finalDirection = glm::cross(m_direction, UP); break;
 	case LEFT: finalDirection = -glm::cross(m_direction, UP); break;
 	case JUMP: finalDirection = UP; break;
-	case DOWN: finalDirection = -UP;
+	case FALL: finalDirection = -UP;
 	}
 
 	m_position += finalDirection * m_speed * time;

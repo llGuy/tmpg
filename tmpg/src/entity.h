@@ -8,7 +8,7 @@ namespace tmpg {
 
     enum movement_t
     {
-	FORWARD, BACKWARD, LEFT, RIGHT, JUMP, DOWN, RUN
+	FORWARD, BACKWARD, LEFT, RIGHT, JUMP, FALL, RUN
     };
 
     class Entity
@@ -18,7 +18,7 @@ namespace tmpg {
 	       float speed, float height);
 	Entity(const glm::vec3&, const glm::vec3&, float speed);
 
-	virtual void Update(float gravity, float time, float groundHeight);
+	virtual void Update(float gravity, float time, float groundHeight, glm::vec3 normal = glm::vec3(0.0f));
 	virtual void Move(movement_t m, float time, float gravity);
 
 	glm::vec3 EyePosition(void) const;

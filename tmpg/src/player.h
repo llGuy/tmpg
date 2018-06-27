@@ -5,6 +5,8 @@
 #include "entity.h"
 #include <glm/glm.hpp>
 
+#define MAX_MOMENTUM 10.0f
+
 namespace tmpg {
 
     enum state_t
@@ -20,7 +22,7 @@ namespace tmpg {
 	Player(const glm::vec3& p, const glm::vec3& d, uint32_t id);
 
 	// update without gravity
-	void Update(float gravity, float time, float groundHeight) override;
+	void Update(float gravity, float time, float groundHeight, glm::vec3 normal = glm::vec3(0.0f)) override;
 	void Move(movement_t m, float time, float gravity) override;
 
 	glm::vec3 Angle(void);
@@ -34,6 +36,10 @@ namespace tmpg {
 	float m_velocity;
 
 	bool m_angleUnder0;
+	bool m_falling;
+	bool m_flying;
+	float m_fallingMomentum;
+	glm::vec3 m_directionMomentum;
 
 	std::string m_name;
     };

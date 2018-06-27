@@ -10,7 +10,7 @@ namespace tmpg {
 	m_position += m_direction;
     }
 
-    void Bullet::Update(float gravity, float time, float groundHeight)
+    void Bullet::Update(float gravity, float time, float groundHeight, glm::vec3 normal)
     {
 	if(!m_static)
 	{

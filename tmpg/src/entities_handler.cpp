@@ -25,7 +25,8 @@ namespace tmpg {
 		      [&](Player& player) -> void 
 		      { 
 			  decltype(auto) position = player.Position();
-			  player.Update(gravity, time, platform.HeightAtPoint(position.x, position.z).first); 
+			  decltype(auto) height = platform.HeightAtPoint(position.x, position.z);
+			  player.Update(gravity, time, height.first, height.second); 
 		      });
 
 	std::for_each(m_bullets.begin(), m_bullets.end(),

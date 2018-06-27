@@ -14,7 +14,7 @@ namespace tmpg {
     public:
 	Bullet(const glm::vec3&, const glm::vec3& dir);
 
-	void Update(float gravity, float time, float groundHeight) override;
+	void Update(float gravity, float time, float groundHeight, glm::vec3 normal = glm::vec3(0.0f)) override;
 	float Angle(float);
 
 	bool& Static(void);

@@ -10,6 +10,7 @@ namespace tmpg {
 	char choice = argv[1][1];
 	if(choice == 'c' /* for client */) m_networkHandler = new net::Client;
 	else if (choice == 's' /* for server */) m_networkHandler = new net::Server;
+	else if (choice == 'o' /* offline */) m_networkHandler = nullptr;
     }
 
     void TMPGEng::InitData(void)
@@ -48,7 +49,8 @@ namespace tmpg {
 
     void TMPGEng::InitConnection(void)
     {
-	m_networkHandler->Launch("192.168.1.230", "5000", m_entitiesHandler, m_inputHandler, m_physicsHandler);
+	if(m_networkHandler != nullptr)
+	    m_networkHandler->Launch("192.168.1.230", "5000", m_entitiesHandler, m_inputHandler, m_physicsHandler);
     }
 
     void TMPGEng::UpdateData(void)
@@ -100,9 +102,10 @@ namespace tmpg {
 	if (m_inputHandler.Key(GLFW_KEY_S)) playerBoundByCamera.Move(BACKWARD, elapsed, m_physicsHandler.Gravity());
 	if (m_inputHandler.Key(GLFW_KEY_D)) playerBoundByCamera.Move(RIGHT, elapsed, m_physicsHandler.Gravity());
 	if (m_inputHandler.Key(GLFW_KEY_SPACE)) playerBoundByCamera.Move(JUMP, elapsed, m_physicsHandler.Gravity());
-	if (m_inputHandler.Key(GLFW_KEY_LEFT_SHIFT)) playerBoundByCamera.Move(DOWN, elapsed, m_physicsHandler.Gravity());
+	
 	if (m_inputHandler.Key(GLFW_KEY_T)) m_entitiesHandler.ToggleThirdPerson();
 	if (m_inputHandler.Key(GLFW_KEY_C)) m_platform.HandleAction(SHIELD, playerBoundByCamera);
+	if (m_inputHandler.Key(GLFW_KEY_LEFT_SHIFT)) playerBoundByCamera.Move(FALL, elapsed, m_physicsHandler.Gravity());
     }
 
     void TMPGEng::CheckWindowResize(void)
