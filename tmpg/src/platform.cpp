@@ -67,7 +67,8 @@ namespace tmpg {
 
 		glm::vec3 a = *m_mesh->Vertex(triangleIndices[0]);
 		glm::vec3 b = *m_mesh->Vertex(triangleIndices[1]);
-		normal = glm::normalize(glm::cross(a, b));
+		glm::vec3 c = *m_mesh->Vertex(triangleIndices[2]);
+		normal = glm::normalize(glm::cross(c - a, b - a));
 //		std::cout << "normal : " << glm::to_string(normal) << std::endl;
 		return BarryCentric(coord1, coord2, coord3, glm::vec2(positionOnTile.x, positionOnTile.y));
 	    };

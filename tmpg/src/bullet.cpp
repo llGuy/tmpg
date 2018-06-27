@@ -17,6 +17,7 @@ namespace tmpg {
 	    // update position
 	    m_position += m_direction * m_speed * time;
 	    m_direction.y += gravity * time * 0.1f;
+	    m_direction = glm::normalize(m_direction);
 	}
     }
 
@@ -29,9 +30,19 @@ namespace tmpg {
 	return m_angle;
     }
 
+    Timer& Bullet::TimeHandler(void)
+    {
+	return m_timer;
+    }
+
     bool& Bullet::Static(void)
     {
 	return m_static;
+    }
+
+    uint32_t& Bullet::Bounces(void)
+    {
+	return m_bounces;
     }
 
 }

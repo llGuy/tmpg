@@ -39,16 +39,27 @@ namespace tmpg {
 	uint32_t eliminatedBullets = 0;
 	for (uint32_t i = 0; i < m_bullets.size(); ++i)
 	{
-	    auto bcrv = QueryBulletCollision(platform, m_bullets[i]);
-	    if (std::get<bool>(bcrv))
+	    if(m_bullets[i].Static())
 	    {
-		//m_bullets[i] = m_bullets[m_bullets.size() - eliminatedBullets - 1];
-		//eliminatedBullets++;
+		if(m_bullets[i].TimeHandler().Elapsed() > BULLET_MAX_ELAPSED_TIME)
+		{
+		    m_bullets[i] = m_bullets[m_bullets.size() - eliminatedBullets - 1];
+		    eliminatedBullets++;
+		}
+	    }
+	    else
+	    {
+		auto bcrv = QueryBulletCollision(platform, m_bullets[i]);
+		if (std::get<bool>(bcrv))
+		{
+		    m_bullets[i] = m_bullets[m_bullets.size() - eliminatedBullets - 1];
+		    eliminatedBullets++;
+		}
 	    }
 	}
 	for (uint32_t i = 0; i < eliminatedBullets; ++i)
 	{
-	    //m_bullets.pop_back();
+	    m_bullets.pop_back();
 	}
 
 	m_camera.UpdateViewMatrix(PlayerBoundByCamera());
@@ -69,20 +80,26 @@ namespace tmpg {
 	auto platformHeight = platform.HeightAtPoint(bullet.Position().x, bullet.Position().z);
 	if (utils::Equf(platformHeight.first, bullet.Position().y) || platformHeight.first > bullet.Position().y)
 	{
-	    if(bullet.Speed() < 2.0f)
+	    if(bullet.Static())
+	    {
+		bullet.Position().y = platformHeight.first + BULLET_MODEL_RADIUS;
+	    }
+	    if(bullet.Speed() < 9.0f)
 	    {
 		bullet.Static() = true;
+		bullet.Position() += platformHeight.first + BULLET_MODEL_RADIUS;
+
+		bullet.TimeHandler().Start();
 	    }
 	    else
 	    {
-		// so that next time entities handler checks collisions, speed isnt halved again
 		bullet.Direction() = glm::reflect(bullet.Direction(), platformHeight.second); // testing
-	        bullet.Position().y = platformHeight.first;
-		bullet.Position() += bullet.Direction() * 0.1f;
-//		if(glm::angle(bullet.Direction(), platformHeight.second) > glm::radians(45.0f)) bullet.Static() = true;
-		bullet.Speed() *= 0.4f;
+		bullet.Direction().y *= 0.85f;
+		bullet.Position() += bullet.Direction() * 0.15f;
+		bullet.Speed() *= 0.75f;
+		bullet.Bounces()++;
 	    }
-	    return std::make_tuple<bool, std::optional<uint32_t>>(true, std::optional<uint32_t>{ /* empty */ });
+	    return std::make_tuple<bool, std::optional<uint32_t>>(false, std::optional<uint32_t>{ /* empty */ });
 	}
 
 	uint32_t playerIndex = 0;

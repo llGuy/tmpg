@@ -13,7 +13,7 @@
 
 // bullet model radius is entity model radius * 0.2f
 #define ENTITY_MODEL_RADIUS 0.5f
-#define BULLET_MODEL_RADIUS ENTITY_MODEL_RADIUS * 0.1f
+#define BULLET_MODEL_RADIUS ENTITY_MODEL_RADIUS * 0.25f
 
 namespace tmpg {
 

@@ -179,7 +179,7 @@ namespace tmpg {
 	m_sceneLayer.BindRenderable(1);
 	decltype(auto) renderer = m_sceneLayer.Renderer();
 
-	glm::mat4 scale = glm::scale(glm::vec3(0.2f, 0.2f, 0.2f));
+	glm::mat4 scale = glm::scale(glm::vec3(BULLET_MODEL_RADIUS));
 
 	for (uint32_t i = 0; i < m_entitiesHandler.NumBullets(); ++i)
 	{
@@ -191,7 +191,7 @@ namespace tmpg {
 		glm::vec3 r = bullet.Direction();		r.z = -1.0f; r.y = 0.0f;
 		rotation = glm::rotate(bullet.Angle(m_timer.Elapsed()), r);
 	    }
-	    else rotation = glm::rotate(bullet.Angle(0.0f), glm::vec3(0.0f, bullet.Position().x, 0.0f));
+	    //else rotation = glm::rotate(bullet.Angle(0.0f), glm::vec3(0.0f, bullet.Direction().y, 0.0f));
 	    glm::mat4 modelMatrix = glm::translate(bullet.Position()) * rotation * scale;
 
 	    renderer.PushMatrix(&modelMatrix[0][0], 1);
