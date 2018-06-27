@@ -111,7 +111,6 @@ namespace tmpg {
 	if(resized)
 	{
 	    auto dimensions = m_inputHandler.WindowSize();
-	    std::cout << glm::to_string(dimensions) << std::endl;
 	    glViewport(0, 0, dimensions.x, dimensions.y);
 	     m_sceneLayer.ProjectionMatrix() = glm::perspective(glm::radians(60.0f), dimensions.x / dimensions.y, 0.01f, 1000.0f);
 	    resized = false;
@@ -191,7 +190,6 @@ namespace tmpg {
 		glm::vec3 r = bullet.Direction();		r.z = -1.0f; r.y = 0.0f;
 		rotation = glm::rotate(bullet.Angle(m_timer.Elapsed()), r);
 	    }
-	    //else rotation = glm::rotate(bullet.Angle(0.0f), glm::vec3(0.0f, bullet.Direction().y, 0.0f));
 	    glm::mat4 modelMatrix = glm::translate(bullet.Position()) * rotation * scale;
 
 	    renderer.PushMatrix(&modelMatrix[0][0], 1);

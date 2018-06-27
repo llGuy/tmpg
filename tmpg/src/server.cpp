@@ -5,6 +5,9 @@
 #include "packet_encoder.h"
 #include "packet_parser.h"
 #include "entity.h"
+#include "packet_type.h"
+
+#include <glm/gtx/string_cast.hpp>
 
 namespace net {
 
@@ -28,11 +31,23 @@ namespace net {
 	m_UDPThread = std::make_unique<std::thread>([&] { UDPThread(eh, ih, ph); });
     }
 
-    uint16_t Server::ParseUDPMessage(Byte* data, uint32_t size, float gravity) const
+    void Server::ParseUDPMessage(Byte* data, uint32_t size, float gravity, tmpg::EntitiesHandler& eh) const
     {
 	PacketParser parser(data, size);
+	uint8_t type = parser.ReadNext<packetType_t>(CHAR_DELIMITER);
+
+	switch(type)
+	{
+	case CLIENT_UPDATE: ParseClientUpdate(parser, gravity, eh);
+	};
+    }
+
+    void Server::ParseClientUpdate(PacketParser& parser, float gravity, tmpg::EntitiesHandler& eh) const
+    {
 	uint16_t playerID = parser.ReadNext<uint16_t>(CHAR_DELIMITER);
+	tmpg::Player& player = eh[playerID];
 	uint8_t flags = parser.ReadNext<uint8_t>(CHAR_DELIMITER);
+	player.Direction() = parser.ReadNext<glm::vec3>(CHAR_DELIMITER);
 	bool keyFlags[5];
 	// print the key flags
 	for(uint32_t i = 0; i < 5; ++i)
@@ -40,12 +55,10 @@ namespace net {
 	    keyFlags[i] = (flags >> i) & 0b00000001;
 	}
 	
-	//if(keyFlags[0]) /* W */ player.Move(tmpg::FORWARD, 0.03f, gravity);
-	//if(keyFlags[1]) /* A */ player.Move(tmpg::LEFT, 0.03f, gravity);
-	//if(keyFlags[2]) /* S */ player.Move(tmpg::BACKWARD, 0.03f, gravity);
-	//if(keyFlags[3]) /* D */ player.Move(tmpg::RIGHT, 0.03f, gravity);
-
-	return playerID;
+	if(keyFlags[0])  player.Move(tmpg::FORWARD, 0.03f, gravity);
+	if(keyFlags[1])  player.Move(tmpg::LEFT, 0.03f, gravity);
+	if(keyFlags[2])  player.Move(tmpg::BACKWARD, 0.03f, gravity);
+	if(keyFlags[3])  player.Move(tmpg::RIGHT, 0.03f, gravity);
     }
 
     void Server::UDPThread(tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph)
@@ -55,9 +68,8 @@ namespace net {
 	{
 	    Byte messageBuffer[BUFFER_MAX_SIZE];
 	    auto pair = m_UDPSocket.ReceiveFrom(messageBuffer, BUFFER_MAX_SIZE);
-	    std::cout << "received message UDP" << std::endl;
 	    // parse message
-	    auto playerID = ParseUDPMessage(messageBuffer, pair.second, ph.Gravity());
+	    ParseUDPMessage(messageBuffer, pair.second, ph.Gravity(), eh);
 	}
     }
 
@@ -67,7 +79,7 @@ namespace net {
 	{
 	    auto socket = m_TCPSocket.Accept();
 	    std::cout << "new client has joined the game" << std::endl;
-
+	    eh.PushPlayer(glm::vec3(0.01f, 0.0f, 2.0f), glm::vec3(1.0f, 0.0f, 1.0f));
 	    m_TCPCommunicationThreads.emplace_back([&] { TCPThread(socket, eh, ih, ph); });
 	}
     }
@@ -76,8 +88,8 @@ namespace net {
 			   tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph)
     {
 	PacketEncoder encoder;
-	encoder.PushBytes(eh.NumPlayers());
-	
+	uint16_t id = eh.NumPlayers() - 1;
+	encoder.PushBytes(id);
 	socket.Send(encoder.Data(), encoder.Size());
 	
 	for(;;)

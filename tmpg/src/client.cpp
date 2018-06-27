@@ -5,8 +5,10 @@
 #include "physics_handler.h"
 #include "packet_parser.h"
 #include "packet_encoder.h"
+#include "packet_type.h"
 
 #include <chrono>
+#include <glm/gtx/string_cast.hpp>
 
 namespace net {
 
@@ -67,7 +69,8 @@ namespace net {
 
 	    // first put username, then key flags, then direction
 	    PacketEncoder encoder;
-	    encoder.PushBytes(m_clientID, flags, direction);
+	    // need to send the type of packet
+	    encoder.PushBytes(CLIENT_UPDATE, m_clientID, flags, direction);
 
 	    m_UDPSocket.Send(encoder.Data(), encoder.Size());
 	    
@@ -75,7 +78,7 @@ namespace net {
 	    // only sleep if time elapsed is less than 30 milliseconds
 	    if(float elapsed = tickRateTracker.Elapsed(); elapsed < 0.03f)
 	    {
-		std::this_thread::sleep_for(std::chrono::duration<float, std::milli>(elapsed * 1000.0f));
+		std::this_thread::sleep_for(std::chrono::duration<float, std::milli>((0.03f- elapsed) * 1000.0f));
 	    }
 	}
     }
