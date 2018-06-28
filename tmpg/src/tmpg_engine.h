@@ -26,6 +26,7 @@ namespace tmpg {
     {
     public:
 	TMPGEng(int32_t argc, char** argv);
+	~TMPGEng(void);
 
 	void Render(void);
 	void InitData(void);

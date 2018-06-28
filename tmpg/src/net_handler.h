@@ -5,6 +5,7 @@
 #include <thread>
 #include <vector>
 #include "socket.h"
+#include "client_addr.h"
 //#include "input_handler.h"
 //#include "entities_handler.h"
 
@@ -32,8 +33,8 @@ namespace net {
 			    tmpg::EntitiesHandler&, tmpg::InputHandler&, tmpg::physics::PhysicsHandler& ph) = 0;
     protected:
 	// tmpg only supports unix for now
-	UnixSocket m_UDPSocket;
-	UnixSocket m_TCPSocket;
+	Socket m_UDPSocket;
+	Socket m_TCPSocket;
 
 	std::unique_ptr<std::thread> m_UDPThread;
     };

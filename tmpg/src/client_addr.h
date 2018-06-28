@@ -1,6 +1,21 @@
 #ifndef _CLIENT_ADDR_H_
 #define _CLIENT_ADDR_H_
 
+#ifdef _WIN32
+
+#include <WS2tcpip.h>
+
+namespace net {
+
+	struct ClientAddr
+	{
+		SOCKADDR_STORAGE addr;
+	};
+
+}
+
+#else
+
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -15,5 +30,7 @@ namespace net {
     };
 
 }
+
+#endif
 
 #endif /* _CLIENT_H_ */
