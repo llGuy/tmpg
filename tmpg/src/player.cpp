@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <glm/gtx/string_cast.hpp>
 #include <glm/gtx/vector_angle.hpp>
 
 #include "player.h"
@@ -12,11 +13,18 @@ namespace tmpg {
 	{
 	}
 
+	bool Player::AtGroundHeight(void)
+	{
+		return fabs(m_groundHeight - m_position.y) < 0.01f || m_groundHeight > m_position.y;
+	}
+
 	void Player::Update(float gravity, float timedelta, float groundHeight, glm::vec3 normal)
 	{
+		//printf("%s\n", glm::to_string(m_directionMomentum).c_str());
+
 		m_groundHeight = groundHeight;
 		// entity is not at ground height
-		if (fabs(m_groundHeight - m_position.y) < 0.01f || m_groundHeight > m_position.y)
+		if (fabs(m_groundHeight - m_position.y) < 0.00001f || m_groundHeight > m_position.y)
 		{
 			m_position.y = m_groundHeight;
 			m_velocity = 0.0f;
@@ -36,7 +44,7 @@ namespace tmpg {
 			float directionAngle = glm::angle(xzNormal, xzDirection);
 			if (fabs(m_fallingMomentum - MAX_MOMENTUM) > 0.001f)
 			{
-				float momentum = (inclineAngle) / glm::radians(90.0f);
+				float momentum = (inclineAngle) / glm::radians(90.0f) - 0.3f;
 				momentum *= 1.0f - (directionAngle / glm::radians(90.0f));
 				m_fallingMomentum += momentum * 0.5f;
 				if (m_fallingMomentum > MAX_MOMENTUM) m_fallingMomentum = MAX_MOMENTUM;
@@ -54,7 +62,8 @@ namespace tmpg {
 			}
 			else m_position.y = m_groundHeight;
 		}
-		m_position += m_directionMomentum * timedelta;
+		if(fabs(m_velocity) > 0.000001f || m_falling)
+			m_position += (m_directionMomentum) * timedelta * (!m_falling ? m_speed : 1.0f);
 	}
 
 	void Player::Move(movement_t m, float time, float gravity)
@@ -65,27 +74,82 @@ namespace tmpg {
 		}
 		else
 		{
-			m_directionMomentum = glm::vec3(0.0f);
 			m_fallingMomentum = 0.0f;
 			m_falling = false;
 		}
 		glm::vec3 finalDirection(0.0f);
 		switch (m)
 		{
-		case FORWARD: finalDirection = glm::normalize(glm::vec3(m_direction.x, 0.0f, m_direction.z)); break;
-		case BACKWARD: finalDirection = -(glm::normalize(glm::vec3(m_direction.x, 0.0f, m_direction.z))); break;
-		case RIGHT: finalDirection = glm::cross(m_direction, UP); break;
-		case LEFT: finalDirection = -glm::cross(m_direction, UP); break;
+		case FORWARD: 
+		{
+			if (AtGroundHeight())
+			{
+				finalDirection = glm::normalize(glm::vec3(m_direction.x, 0.0f, m_direction.z));
+				m_directionMomentum = finalDirection;
+				break;
+			}
+			else return;
+		}
+		case BACKWARD: 
+		{
+			if (AtGroundHeight())
+			{
+				finalDirection = -(glm::normalize(glm::vec3(m_direction.x, 0.0f, m_direction.z))); 
+				m_directionMomentum = finalDirection;
+				break;
+			}
+			else return;
+		}
+		case RIGHT: 
+		{
+			if (AtGroundHeight())
+			{
+				finalDirection = glm::cross(m_direction, UP); 
+				m_directionMomentum = finalDirection;
+			}
+			else
+			{
+				// rotate direction
+				glm::mat3 rotation = glm::mat3(glm::rotate(glm::radians(-90.0f * time), glm::vec3(0.0f, m_speed, 0.0f)));
+				m_directionMomentum = rotation * m_directionMomentum;
+				m_direction = rotation * m_direction;
+			}
+			break;
+		}
+		case LEFT: 
+		{
+			if (AtGroundHeight())
+			{
+				finalDirection = -glm::cross(m_direction, UP); 
+				m_directionMomentum = finalDirection;
+			}
+			else
+			{
+				// rotate direction
+				glm::mat3 rotation = glm::mat3(glm::rotate(glm::radians(90.0f * time), glm::vec3(0.0f, m_speed, 0.0f)));
+				m_directionMomentum = rotation * m_directionMomentum;
+				m_direction = rotation * m_direction;
+			}
+			break;
+		}
 		case JUMP:
 		{
 			Jump(gravity, time);
+			//if(glm::all(glm::greaterThan(glm::abs(m_directionMomentum - glm::vec3(0.0f)), glm::vec3(0.00001f))))
+			//	m_directionMomentum = glm::normalize(m_directionMomentum);
 			return;
 		}
 		}
-
 		m_position += finalDirection * m_speed * time;
 	}
 
+	void Player::NeutralizeMomentum(void)
+	{
+		if (AtGroundHeight() && !m_falling)
+		{
+			m_directionMomentum = glm::vec3(0.0f);
+		}
+	}
 
 	void Player::Jump(float gravity, float timedelta)
 	{

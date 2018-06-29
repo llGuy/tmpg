@@ -121,12 +121,17 @@ namespace tmpg {
 	void TMPGEng::CheckKeyboardUpdates(float elapsed)
 	{
 		decltype(auto) playerBoundByCamera = m_entitiesHandler.PlayerBoundByCamera();
-		if (m_inputHandler.Key(GLFW_KEY_W)) playerBoundByCamera.Move(FORWARD, elapsed, m_physicsHandler.Gravity());
-		if (m_inputHandler.Key(GLFW_KEY_A)) playerBoundByCamera.Move(LEFT, elapsed, m_physicsHandler.Gravity());
-		if (m_inputHandler.Key(GLFW_KEY_S)) playerBoundByCamera.Move(BACKWARD, elapsed, m_physicsHandler.Gravity());
-		if (m_inputHandler.Key(GLFW_KEY_D)) playerBoundByCamera.Move(RIGHT, elapsed, m_physicsHandler.Gravity());
-		if (m_inputHandler.Key(GLFW_KEY_SPACE)) playerBoundByCamera.Move(JUMP, elapsed, m_physicsHandler.Gravity());
+		int32_t movement = 4;
 
+		if (m_inputHandler.Key(GLFW_KEY_W)) { playerBoundByCamera.Move(FORWARD, elapsed, m_physicsHandler.Gravity()); movement--; }
+		if (m_inputHandler.Key(GLFW_KEY_A)) { playerBoundByCamera.Move(LEFT, elapsed, m_physicsHandler.Gravity()); movement--; }
+		if (m_inputHandler.Key(GLFW_KEY_S)) { playerBoundByCamera.Move(BACKWARD, elapsed, m_physicsHandler.Gravity()); movement--; }
+		if (m_inputHandler.Key(GLFW_KEY_D)) { playerBoundByCamera.Move(RIGHT, elapsed, m_physicsHandler.Gravity()); movement--;	}
+
+		if (movement == 4) 
+			playerBoundByCamera.NeutralizeMomentum();
+
+		if (m_inputHandler.Key(GLFW_KEY_SPACE)) playerBoundByCamera.Move(JUMP, elapsed, m_physicsHandler.Gravity());
 		if (m_inputHandler.Key(GLFW_KEY_T)) m_entitiesHandler.ToggleThirdPerson();
 		if (m_inputHandler.Key(GLFW_KEY_C)) m_platform.HandleAction(SHIELD, playerBoundByCamera);
 		if (m_inputHandler.Key(GLFW_KEY_LEFT_SHIFT)) playerBoundByCamera.Move(FALL, elapsed, m_physicsHandler.Gravity());
@@ -138,7 +143,7 @@ namespace tmpg {
 		if (resized)
 		{
 			auto dimensions = m_inputHandler.WindowSize();
-			glViewport(0, 0, dimensions.x, dimensions.y);
+			glViewport(0, 0, static_cast<int32_t>(dimensions.x), static_cast<int32_t>(dimensions.y));
 			m_sceneLayer.ProjectionMatrix() = glm::perspective(glm::radians(60.0f), dimensions.x / dimensions.y, 0.01f, 1000.0f);
 			resized = false;
 		}

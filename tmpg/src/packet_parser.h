@@ -10,7 +10,7 @@ namespace net {
     class PacketParser
     {
     public:
-	PacketParser(Byte* bytes, int32_t size)
+	PacketParser(Byte* bytes, uint32_t size)
 	    : m_bytes(bytes), m_index(0), m_size(size)
 	{
 	}
@@ -38,7 +38,7 @@ namespace net {
 	}
     private:
 	Byte* m_bytes;
-	int32_t m_size;
+	uint32_t m_size;
 	uint32_t m_index;
     };
     

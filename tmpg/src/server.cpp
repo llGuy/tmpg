@@ -67,9 +67,9 @@ namespace net {
 		for (;;)
 		{
 			Byte messageBuffer[BUFFER_MAX_SIZE];
-//			auto pair = m_UDPSocket.ReceiveFrom(messageBuffer, BUFFER_MAX_SIZE);
+			auto pair = m_UDPSocket.ReceiveFrom(messageBuffer, BUFFER_MAX_SIZE);
 			// parse message
-//			ParseUDPMessage(messageBuffer, pair.second, ph.Gravity(), eh);
+			ParseUDPMessage(messageBuffer, pair.second, ph.Gravity(), eh);
 		}
 	}
 
