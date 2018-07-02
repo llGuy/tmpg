@@ -13,7 +13,7 @@
 namespace net {
 
 	void Client::Launch(const std::string& addr, const std::string& port,
-		tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph)
+		tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph, tmpg::Platform& platform)
 	{
 		SocketInit initTCP{ AF_INET, SOCK_STREAM, IPPROTO_TCP };
 		m_TCPSocket.Init(initTCP, 0, addr.c_str(), port.c_str());
@@ -54,14 +54,18 @@ namespace net {
 			tickRateTracker.Reset();
 			bool keys[]
 			{
-			ih.Key(GLFW_KEY_W),
-			ih.Key(GLFW_KEY_A),
-			ih.Key(GLFW_KEY_S),
-			ih.Key(GLFW_KEY_D),
-			ih.Key(GLFW_KEY_SPACE)
+				ih.Key(GLFW_KEY_W),
+				ih.Key(GLFW_KEY_A),
+				ih.Key(GLFW_KEY_S),
+				ih.Key(GLFW_KEY_D),
+				ih.Key(GLFW_KEY_SPACE),
+				ih.Key(GLFW_KEY_C),
+
+				ih.MouseButton(GLFW_MOUSE_BUTTON_1),
+				ih.MouseButton(GLFW_MOUSE_BUTTON_2)
 			};
 
-			auto flags = Flags<uint8_t>(keys, sizeof(keys) / sizeof(bool));
+			auto flags = Flags<uint16_t>(keys, sizeof(keys) / sizeof(bool));
 
 			auto& player = eh.PlayerBoundByCamera();
 			auto& direction = player.Direction();

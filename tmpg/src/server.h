@@ -30,15 +30,15 @@ namespace net {
 		Server(void) = default;
 
 		void Launch(const std::string& address, const std::string& port,
-			tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph) override;
+			tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph, tmpg::Platform& platform) override;
 	private:
-		void UDPThread(tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph);
+		void UDPThread(tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph, tmpg::Platform& platform);
 		// thread for communicating with each client
 		void TCPThread(Socket socket, tmpg::EntitiesHandler& eh,
 			tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph); // take socket by copy
 		void TCPAcceptThread(tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph);
-		void ParseUDPMessage(Byte* data, uint32_t size, float gravity, tmpg::EntitiesHandler& eh) const;
-		void ParseClientUpdate(PacketParser& parser, float gravity, tmpg::EntitiesHandler& eh) const;
+		void ParseUDPMessage(Byte* data, uint32_t size, float gravity, tmpg::EntitiesHandler& eh, tmpg::Platform& platform) const;
+		void ParseClientUpdate(PacketParser& parser, float gravity, tmpg::EntitiesHandler& eh, tmpg::Platform& platform) const;
 	private:
 		static constexpr uint32_t MAX_PENDING = 10;
 

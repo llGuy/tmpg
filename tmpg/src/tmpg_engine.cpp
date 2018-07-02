@@ -74,7 +74,7 @@ namespace tmpg {
 #endif
 
 		if (m_networkHandler != nullptr)
-			m_networkHandler->Launch("192.168.1.230", "5000", m_entitiesHandler, m_inputHandler, m_physicsHandler);
+			m_networkHandler->Launch("192.168.1.230", "5000", m_entitiesHandler, m_inputHandler, m_physicsHandler, m_platform);
 	}
 
 	void TMPGEng::UpdateData(void)

@@ -5,6 +5,7 @@
 #include "entity.h"
 #include <glm/glm.hpp>
 
+#define PLAYER_SPEED 4.0f
 #define MAX_MOMENTUM 10.0f
 
 namespace tmpg {

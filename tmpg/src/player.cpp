@@ -8,7 +8,7 @@
 namespace tmpg {
 
 	Player::Player(const glm::vec3& p, const glm::vec3& d, uint32_t id)
-		: Entity(p, d, id, 4.0f, 0.5f), m_velocity(0.0f), m_angleUnder0(false), m_falling(false), m_fallingMomentum(0.0f), m_flying(false),
+		: Entity(p, d, id, 0.0f, 0.5f), m_velocity(0.0f), m_angleUnder0(false), m_falling(false), m_fallingMomentum(0.0f), m_flying(false),
 		m_directionMomentum(0.0f)
 	{
 	}
@@ -62,6 +62,8 @@ namespace tmpg {
 			}
 			else m_position.y = m_groundHeight;
 		}
+		if (m_speed < PLAYER_SPEED) m_speed += (PLAYER_SPEED * 3.0f) * timedelta;
+
 		if(fabs(m_velocity) > 0.000001f || m_falling)
 			m_position += (m_directionMomentum) * timedelta * (!m_falling ? m_speed : 1.0f);
 	}
@@ -148,6 +150,7 @@ namespace tmpg {
 		if (AtGroundHeight() && !m_falling)
 		{
 			m_directionMomentum = glm::vec3(0.0f);
+			m_speed = 0.0f;
 		}
 	}
 

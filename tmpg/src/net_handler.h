@@ -6,6 +6,7 @@
 #include <vector>
 #include "socket.h"
 #include "client_addr.h"
+#include "platform.h"
 //#include "input_handler.h"
 //#include "entities_handler.h"
 
@@ -30,7 +31,7 @@ namespace net {
 	virtual ~NetworkHandler(void) {}
 
 	virtual void Launch(const std::string& address, const std::string& port,
-			    tmpg::EntitiesHandler&, tmpg::InputHandler&, tmpg::physics::PhysicsHandler& ph) = 0;
+		tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph, tmpg::Platform& platform) = 0;
     protected:
 	// tmpg only supports unix for now
 	Socket m_UDPSocket;
