@@ -123,12 +123,12 @@ namespace tmpg {
 	m_players.emplace_back(p, d, m_players.size());
     }
 
-    void EntitiesHandler::PushBullet(void)
+    void EntitiesHandler::PushBullet(uint32_t index)
     {
 	if (m_bulletTimer.Elapsed() > 0.175f)
 	{
-	    Player& bound = PlayerBoundByCamera();
-	    m_bullets.emplace_back(bound.EyePosition(), bound.Direction());
+	    Player& player = m_players[index];
+	    m_bullets.emplace_back(player.EyePosition(), player.Direction());
 	    m_bulletTimer.Reset();
 	}
     }
