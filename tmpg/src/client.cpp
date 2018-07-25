@@ -53,6 +53,8 @@ namespace net {
 		// may receive stuff like new players or username changes
 	}
 
+	void do_noth(void) {}
+
 	void Client::UDPThread(tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph)
 	{
 		tmpg::Timer tickRateTracker;
@@ -76,9 +78,13 @@ ih.Key(GLFW_KEY_LEFT_SHIFT),
 			ih.MouseButton(GLFW_MOUSE_BUTTON_1),
 			ih.MouseButton(GLFW_MOUSE_BUTTON_2)
 			};
-
-
-			for (uint32_t i = 0; i < sizeof(keys) / sizeof(bool); playerUpdated |= keys[i++]);
+			for (uint32_t i = 0; i < sizeof(keys) / sizeof(bool); ++i)
+			{
+				playerUpdated |= keys[i];
+				std::cout << (int)playerUpdated;
+			}
+			std::cout << std::endl;
+				
 			playerUpdated |= ih.CursorMoved();
 
 			if (playerUpdated)
