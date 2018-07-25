@@ -6,6 +6,7 @@
 #include "packet_parser.h"
 #include "packet_encoder.h"
 #include "packet_type.h"
+#include "camera.h"
 
 #include <chrono>
 #include <glm/gtx/string_cast.hpp>
@@ -77,17 +78,18 @@ ih.Key(GLFW_KEY_LEFT_SHIFT),
 	    auto flags = Flags<uint16_t>(keys, sizeof(keys) / sizeof(bool));
 
 	    auto& player = eh.PlayerBoundByCamera();
-	    auto& direction = player.Direction();
+//	    auto& direction = player.Direction();
+		auto& cursorDifference = ih.CursorDifference();
 	    auto& username = player.Username();
 
 	    // first put username, then key flags, then direction
 	    PacketEncoder encoder;
 	    // need to send the type of packet
 //	    encoder.PushBytes(CLIENT_UPDATE, m_clientID, flags, direction);
-		encoder.PushBytes(CLIENT_UPDATE, m_clientID, m_packetID++, flags, direction);
+		encoder.PushBytes(CLIENT_UPDATE, m_clientID, m_packetID++, flags, cursorDifference);
 
 		print(static_cast<uint32_t>(CLIENT_UPDATE), " ", m_clientID, " ", static_cast<uint32_t>(flags),
-			glm::to_string(direction), username);
+			glm::to_string(cursorDifference), username);
 
 	    m_UDPSocket.Send(encoder.Data(), encoder.Size());
 
@@ -97,7 +99,34 @@ ih.Key(GLFW_KEY_LEFT_SHIFT),
 	    {
 		std::this_thread::sleep_for(std::chrono::duration<float, std::milli>((0.03f - elapsed) * 1000.0f));
 	    }
+
+		ReceiveServerUpdate(eh, ih, ph);
 	}
     }
+
+	void Client::ReceiveServerUpdate(tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph)
+	{
+		Byte buffer[512];
+		auto pair = m_UDPSocket.ReceiveFrom(buffer, 512);
+
+		if (pair.second != 0)
+		{
+			PacketParser parser{ buffer, static_cast<uint32_t>(pair.second) };
+			uint16_t clientID = parser.ReadNext<uint16_t>(CHAR_DELIMITER);
+			uint64_t packetID = parser.ReadNext<uint64_t>(CHAR_DELIMITER);
+			glm::vec3 position = parser.ReadNext<glm::vec3>(CHAR_DELIMITER);
+			glm::vec3 direction = parser.ReadNext<glm::vec3>(CHAR_DELIMITER);
+			uint16_t flags = parser.ReadNext<uint16_t>(CHAR_DELIMITER);
+
+			eh.PlayerBoundByCamera().Position() = position;
+			eh.PlayerBoundByCamera().Direction() = direction;
+
+			if (ih.Key(GLFW_KEY_P))
+			{
+				std::cout << glm::to_string(position) << std::endl << glm::to_string(direction) << std::endl;
+				std::cout << clientID << std::endl;
+			}
+		}
+	}
 
 }

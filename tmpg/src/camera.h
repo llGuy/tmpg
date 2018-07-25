@@ -11,8 +11,10 @@ namespace tmpg {
 	class Camera
 	{
 	public:
+		static glm::vec3 Look(const glm::vec3& direction,  const glm::vec2& cursorDiff, float sensitivity);
+	public:
 		Camera(void);
-		
+
 		void Bind(uint32_t id);
 		void UpdateCursorPosition(const glm::vec2& pos);
 		void Look(Entity& entity, const glm::vec2& cursor, float sensitivity);

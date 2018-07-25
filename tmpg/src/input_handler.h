@@ -22,6 +22,7 @@ namespace tmpg {
 	bool CursorMoved(void);
 	bool& MouseButton(int32_t mouseButton);
 	const glm::vec2& CursorPosition(void);
+	const glm::vec2& CursorDifference(void);
 
 	const glm::vec2 WindowSize(void);
     public:

@@ -36,7 +36,9 @@ namespace tmpg {
     void InputHandler::HandleMouseMovement(GLFWwindow* win, double x, double y)
     {
 	InputHandler* inputHandler = (InputHandler*)glfwGetWindowUserPointer(win);
-	inputHandler->m_currentCursorPosition = glm::vec2(static_cast<float>(x), static_cast<float>(y));
+	glm::vec2 newPosition = glm::vec2(static_cast<float>(x), static_cast<float>(y));
+	inputHandler->m_cursorDifference = newPosition - inputHandler->m_currentCursorPosition;
+	inputHandler->m_currentCursorPosition = newPosition;
 	inputHandler->m_cursorMoved = true;
     }
 
@@ -75,5 +77,10 @@ namespace tmpg {
     {
 	return m_cursorMoved;
     }
+
+	const glm::vec2& InputHandler::CursorDifference(void)
+	{
+		return m_cursorDifference;
+	}
 
 }

@@ -17,6 +17,25 @@ namespace tmpg {
 		m_cursorPosition = pos;
 	}
 
+	glm::vec3 Camera::Look(const glm::vec3& direction, const glm::vec2& cursorDiff, float sensitivity)
+	{
+		static constexpr glm::vec3 UP = glm::vec3(0.0f, 1.0f, 0.0f);
+
+		glm::vec2 cursorPosDiff = cursorDiff;
+		
+		float xAngle = glm::radians(-cursorPosDiff.x) * sensitivity;
+		float yAngle = glm::radians(-cursorPosDiff.y) * sensitivity;
+		
+		glm::vec3 edir = direction;
+		
+		edir = glm::mat3(glm::rotate(xAngle, UP)) * edir;
+		
+		glm::vec3 rotateYAx = glm::cross(edir, UP);
+		edir = glm::mat3(glm::rotate(yAngle, rotateYAx)) * edir;
+
+		return edir;
+	}
+
 	void Camera::Look(Entity& entity, const glm::vec2& cursor, float sensitivity)
 	{
 		static constexpr glm::vec3 UP = glm::vec3(0.0f, 1.0f, 0.0f);
