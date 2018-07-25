@@ -26,7 +26,7 @@ namespace net {
 	_Ty Flags(bool* bytes, uint32_t size)
 	    {
 		_Ty flags = (_Ty)0;
-		for (uint32_t i = 0; i < sizeof(bytes) / sizeof(int8_t); ++i)
+		for (uint32_t i = 0; i < size; ++i)
 		{
 		    bool flag = bytes[i];
 		    flags += flag << i;
@@ -39,6 +39,7 @@ namespace net {
 
 	// client id that the server uses to map clients' addresses
 	uint16_t m_clientID;
+	uint64_t m_packetID;
     };
 
 }

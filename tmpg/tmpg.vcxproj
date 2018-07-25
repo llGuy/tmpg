@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{3AB95685-270E-410D-BFBC-3958B27BC05C}</ProjectGuid>
     <RootNamespace>tmpg</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -76,9 +76,9 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies/GLFW/include;$(SolutionDir)Dependencies/GLEW/include;$(SolutionDir)Dependencies</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_MBCS;GLM_ENABLE_EXPERIMENTAL;GLEW_STATIC;STB_IMAGE_IMPLEMENTATION</PreprocessorDefinitions>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>C:/include/GLFW/include;C:/include/GLEW/include;C:/include/</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>GLEW_STATIC;GLM_ENABLE_EXPERIMENTAL</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)Dependencies/GLFW/lib-vc2015;$(SolutionDir)Dependencies/stb-master;$(SolutionDir)Dependencies/GLEW/lib/Release/Win32</AdditionalLibraryDirectories>
@@ -101,6 +101,9 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:/include/GLFW/include;C:/include/GLEW/include;C:/include/</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -122,7 +125,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="src\batch_renderer.cpp" />
     <ClCompile Include="src\bullet.cpp" />
     <ClCompile Include="src\camera.cpp" />
@@ -140,10 +142,11 @@
     <ClCompile Include="src\renderer_3D.cpp" />
     <ClCompile Include="src\server.cpp" />
     <ClCompile Include="src\shader.cpp" />
-    <ClCompile Include="src\socket.cpp" />
     <ClCompile Include="src\timer.cpp" />
     <ClCompile Include="src\tmpg_engine.cpp" />
+    <ClCompile Include="src\unix_socket.cpp" />
     <ClCompile Include="src\window.cpp" />
+    <ClCompile Include="src\win_socket.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\batch_renderer.h" />
@@ -178,9 +181,11 @@
     <ClInclude Include="src\socket.h" />
     <ClInclude Include="src\timer.h" />
     <ClInclude Include="src\tmpg_engine.h" />
+    <ClInclude Include="src\unix_socket.h" />
     <ClInclude Include="src\utils.h" />
     <ClInclude Include="src\vao.h" />
     <ClInclude Include="src\window.h" />
+    <ClInclude Include="src\win_socket.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\scene\fsh.shader" />

@@ -122,31 +122,31 @@ namespace tmpg {
 
     void Platform::UpdateFP(uint32_t fp, float timedelta)
     {
-	ForcePoint& fpStruct = m_forcePoints[fp].fp;
-
-	auto updateQuarter = [&](int32_t quotx, int32_t quotz, bool updateCenter, bool updateRadius) -> void
-	    {
-		for (uint32_t moundindex = 0; moundindex < m_mound.Size(); ++moundindex)
+		ForcePoint& fpStruct = m_forcePoints[fp].fp;
+		
+		auto updateQuarter = [&](int32_t quotx, int32_t quotz, bool updateCenter, bool updateRadius) -> void
 		{
-		    auto mp = m_mound.At(moundindex, fpStruct.position, quotx, quotz);
-
-		    bool updateVertex = true;
-		    if (!updateRadius)
-			updateVertex &= !(mp.terrainSpacePos.x == fpStruct.position.x || mp.terrainSpacePos.y == fpStruct.position.y);
-		    if (!updateCenter)
-			updateVertex &= !(mp.terrainSpacePos == fpStruct.position);
-		    if (updateVertex)
-		    {
-			auto vertex = At(mp.terrainSpacePos.x, mp.terrainSpacePos.y);
-			if (vertex.has_value())
+			for (uint32_t moundindex = 0; moundindex < m_mound.Size(); ++moundindex)
 			{
-			    glm::vec3& v = *vertex.value();
-			    float newHeight = v.y + mp.quotient * fpStruct.intensity;
-			    if (v.y < newHeight)
-				v.y += mp.quotient * fpStruct.intensity * timedelta;
-			}
+				auto mp = m_mound.At(moundindex, fpStruct.position, quotx, quotz);
+				
+				bool updateVertex = true;
+				if (!updateRadius)
+					updateVertex &= !(mp.terrainSpacePos.x == fpStruct.position.x || mp.terrainSpacePos.y == fpStruct.position.y);
+				if (!updateCenter)
+updateVertex &= !(mp.terrainSpacePos == fpStruct.position);
+				if (updateVertex)
+				{
+					auto vertex = At(mp.terrainSpacePos.x, mp.terrainSpacePos.y);
+					if (vertex.has_value())
+					{
+						glm::vec3& v = *vertex.value();
+float newHeight = v.y + mp.quotient * fpStruct.intensity;
+if (v.y < newHeight)
+	v.y += mp.quotient * fpStruct.intensity * timedelta;
+					}
 		    }
-		}
+			}
 	    };
 
 	updateQuarter(1, 1, true, true);

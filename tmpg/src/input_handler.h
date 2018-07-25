@@ -34,6 +34,7 @@ namespace tmpg {
 	std::array<bool, MAX_MOUSE_BUTTONS> m_mouseButtonMap;
 
 	glm::vec2 m_currentCursorPosition;
+	glm::vec2 m_cursorDifference;
 	// if cursor did not move, do not calculate entity new direction
 	bool m_cursorMoved;
 	bool m_windowResized;

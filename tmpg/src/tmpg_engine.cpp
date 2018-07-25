@@ -1,12 +1,22 @@
 #include "tmpg_engine.h"
 #include <glm/gtx/string_cast.hpp>
 
+auto big_or_small(void) -> void
+{
+	int x = 1;
+	char * ptr = (char*)&x;
+	if (!(*ptr)) std::cout << "big" << std::endl;
+	else std::cout << "small" << std::endl;
+}
+
 namespace tmpg {
 
     TMPGEng::TMPGEng(int32_t argc, char** argv)
 	: m_win("the multiplayer game", DISPLAY_WIDTH, DISPLAY_HEIGHT),
 	  m_sceneLayer(glm::perspective(glm::radians(60.0f), (float)DISPLAY_WIDTH / DISPLAY_HEIGHT, 0.01f, 1000.0f))
     {
+
+		big_or_small();
 
 #ifdef _WIN32
 
@@ -74,7 +84,7 @@ namespace tmpg {
 #endif
 
 	if (m_networkHandler != nullptr)
-	    m_networkHandler->Launch("192.168.1.124", "5000", m_entitiesHandler, m_inputHandler, m_physicsHandler, m_platform);
+	    m_networkHandler->Launch("146.179.210.166", "5000", m_entitiesHandler, m_inputHandler, m_physicsHandler, m_platform);
     }
 
     void TMPGEng::UpdateData(void)

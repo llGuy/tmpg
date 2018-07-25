@@ -21,7 +21,7 @@ namespace net {
 	uint32_t entityIndex;
 	uint64_t packet;
 
-	bool actions[9];
+	bool actions[10];
     };
 
     class PacketParser;
@@ -40,8 +40,10 @@ namespace net {
 	void TCPThread(Socket socket, tmpg::EntitiesHandler& eh,
 		       tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph); // take socket by copy
 	void TCPAcceptThread(tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph);
-	uint16_t ParseUDPMessage(Byte* data, uint32_t size, float gravity, tmpg::EntitiesHandler& eh, tmpg::Platform& platform);
-	uint16_t ParseClientUpdate(PacketParser& parser, float gravity, tmpg::EntitiesHandler& eh, tmpg::Platform& platform);
+	uint16_t ParseUDPMessage(Byte* data, uint32_t size, float gravity, 
+		tmpg::EntitiesHandler& eh, tmpg::Platform& platform, tmpg::InputHandler& inputHandler);
+	uint16_t ParseClientUpdate(PacketParser& parser, float gravity, tmpg::EntitiesHandler& eh, tmpg::Platform& platform,
+		tmpg::InputHandler& ih);
 
 	void UpdateClient(const ClientAddr& address, tmpg::EntitiesHandler& eh);
 

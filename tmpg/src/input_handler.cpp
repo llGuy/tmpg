@@ -5,7 +5,7 @@
 namespace tmpg {
 
     InputHandler::InputHandler(void)
-	: m_keyMap { 0 }, m_mouseButtonMap { 0 }, m_windowResized(false)
+	: m_keyMap { 0 }, m_mouseButtonMap { 0 }, m_windowResized(false), m_cursorDifference(0.0f)
     {
     }
 
