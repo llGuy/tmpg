@@ -52,6 +52,7 @@ namespace net {
 		uint16_t playerID = parser.ReadNext<uint16_t>(CHAR_DELIMITER);
 		uint64_t packet = parser.ReadNext<uint64_t>(CHAR_DELIMITER);
 		auto& client = m_addresses[playerID];
+		auto& history = client.history;
 		client.entityIndex = playerID;
 		client.packet = packet;
 		tmpg::Player& player = eh[playerID];
@@ -88,6 +89,8 @@ namespace net {
 		if (client.actions[8])  platform.HandleAction(tmpg::START_TERRAFORMING, player);
 		else		  platform.HandleAction(tmpg::END_TERRAFORMING, player);
 
+		history.Push({ packet, player.Position(), player.Direction() });
+
 		return playerID;
 	}
 
@@ -99,12 +102,35 @@ namespace net {
 			Byte messageBuffer[BUFFER_MAX_SIZE];
 			auto pair = m_UDPSocket.ReceiveFrom(messageBuffer, BUFFER_MAX_SIZE);
 			// parse message
-			auto player = ParseUDPMessage(messageBuffer, pair.second, ph.Gravity(), eh, platform, ih);
-			auto clientData = m_addresses[player];
-			clientData.address = pair.first;
-			clientData.entityIndex = player;
+			if (pair.second != 0)
+			{
+				auto player = ParseUDPMessage(messageBuffer, pair.second, ph.Gravity(), eh, platform, ih);
+				auto clientData = m_addresses[player];
+				clientData.address = pair.first;
+				clientData.entityIndex = player; 
+				UpdateClient(clientData.address, eh);
+			}
 
-			UpdateClient(clientData.address, eh);
+
+
+			/*
+			
+			FUTURE LUC !!!! READ THIS   :
+
+			MAKE SURE THAT THE SERVER DOESN'T ONLY UPDATE THE CLIENT WHEN A PACKET IS SENT
+			BUT THAT IT DOES SO ALL THE TIME
+
+
+			ALSO !!!!!!!! 
+			MAKE SURE THAT THE SERVER KNOWS THE ADDRESS OF THE CLIENT BEFORE THE THE FIRST PACKET OF
+			THE CLIENT IS SENT BECAUSE IT NEED TO UPDATE THE CLIENT AS SOON AS POSSIBLE !!!
+			
+			
+			*/
+
+
+
+
 		}
 	}
 

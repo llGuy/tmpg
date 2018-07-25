@@ -105,8 +105,8 @@ namespace tmpg {
 		// needs a timer to check that the protection point didn't last over a certain time
 		std::vector<EntityMappedPP> m_protectionPoints;
 		Timer m_ppTimer;
-		Mound<8> m_mound;
-		Shield<8> m_shield;
+		Mound<5> m_mound;
+		Shield<5> m_shield;
 	};
 
 }

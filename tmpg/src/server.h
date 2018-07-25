@@ -6,6 +6,7 @@
 #include <unordered_map>
 
 #include "net_handler.h"
+#include "packet_history.h"
 
 namespace tmpg {
 
@@ -16,12 +17,13 @@ namespace tmpg {
 namespace net {
 
     struct ClientData
-    {
-	ClientAddr address;
-	uint32_t entityIndex;
-	uint64_t packet;
-
-	bool actions[10];
+	{
+		ClientAddr address;
+		uint32_t entityIndex;
+		uint64_t packet;
+		PacketHistory history;
+		
+		bool actions[10];
     };
 
     class PacketParser;
