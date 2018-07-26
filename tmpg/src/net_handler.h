@@ -23,12 +23,15 @@ namespace tmpg {
 }
 
 namespace net {    
+
+	enum mode { CLIENT, SERVER, INVALID };
     
     class NetworkHandler
     {
     public:
 	NetworkHandler(void) = default;
 	virtual ~NetworkHandler(void) {}
+	virtual mode Mode(void) { return INVALID; }
 
 	virtual void Launch(const std::string& address, const std::string& port,
 		tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph, tmpg::Platform& platform) = 0;

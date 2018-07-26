@@ -81,6 +81,8 @@ namespace tmpg {
 		void Generate(void);
 		Renderable3D* Mesh(void);
 
+		bool& UpdatedExternally(void) { return m_updatedExternally; }
+
 		// handling input
 		void HandleAction(action_t action, Entity& entity);
 
@@ -93,6 +95,7 @@ namespace tmpg {
 		uint32_t VIndexf(float x, float z);
 	public:
 		void UpdateForcePoints(float timedelta);
+		void UpdateMesh(void);
 		void UpdateProtectionPoints(float timedelta, EntitiesHandler& ehandler);
 		void UpdateFP(uint32_t fp, float timedelta);
 		void UpdatePP(uint32_t i, float timedelta, EntitiesHandler& ehandler);
@@ -107,6 +110,8 @@ namespace tmpg {
 		Timer m_ppTimer;
 		Mound<5> m_mound;
 		Shield<5> m_shield;
+
+		bool m_updatedExternally;
 	};
 
 }

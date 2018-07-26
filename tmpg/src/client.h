@@ -14,6 +14,8 @@ namespace net {
     public:
 	Client(void) = default;
 
+	mode Mode(void) override { return CLIENT; }
+	
 	void Launch(const std::string& address, const std::string& port,
 		    tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph, tmpg::Platform& platform) override;
     private:

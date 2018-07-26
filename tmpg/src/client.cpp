@@ -82,6 +82,8 @@ namespace net {
 				for (uint32_t i = 0; i < inputSequenceSize; ++i) encoder.PushBytes(ih[i]);
 
 				m_UDPSocket.Send(encoder.Data(), encoder.Size());
+
+				ih.ResetInputSequence();
 			}
 
 			// one tick is 30 seconds
@@ -97,8 +99,8 @@ namespace net {
 
 	void Client::ReceiveServerUpdate(tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph)
 	{
-		Byte buffer[512];
-		auto size = m_UDPSocket.Receive(buffer, 512);
+		Byte buffer[2048];
+		auto size = m_UDPSocket.Receive(buffer, 2048);
 
 		if (size > 0)
 		{
@@ -122,6 +124,7 @@ namespace net {
 				}
 			}
 		}
+		m_packetID++;
 	}
 
 }

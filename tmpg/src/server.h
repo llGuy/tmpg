@@ -33,6 +33,7 @@ namespace net {
     {
     public:
 	Server(void) = default;
+	mode Mode(void) override { return SERVER; }
 
 	void Launch(const std::string& address, const std::string& port,
 		    tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph, tmpg::Platform& platform) override;

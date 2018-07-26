@@ -92,8 +92,12 @@ namespace tmpg {
 		float elapsed = m_timer.Elapsed();
 
 		m_entitiesHandler.UpdateEntities(m_physicsHandler.Gravity(), elapsed, m_platform);
-		m_platform.UpdateForcePoints(elapsed);
-		m_platform.UpdateProtectionPoints(elapsed, m_entitiesHandler);
+		if (m_networkHandler->Mode() == net::CLIENT)
+		{
+			m_platform.UpdateForcePoints(elapsed);
+			m_platform.UpdateProtectionPoints(elapsed, m_entitiesHandler);
+		}
+		else if (m_platform.UpdatedExternally()) m_platform.UpdateMesh();
 
 		CheckMouseUpdates();
 		CheckKeyboardUpdates(elapsed);

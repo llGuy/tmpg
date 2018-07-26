@@ -102,7 +102,7 @@ namespace tmpg {
 			Key(GLFW_KEY_W),
 			Key(GLFW_KEY_A),
 			Key(GLFW_KEY_S),
-			Key(GLFW_KEY_A),
+			Key(GLFW_KEY_D),
 			Key(GLFW_KEY_SPACE),
 			Key(GLFW_KEY_C),
 			Key(GLFW_KEY_LEFT_SHIFT),

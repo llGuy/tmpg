@@ -60,8 +60,6 @@ namespace net {
 	uint16_t Server::ParseClientUpdate(PacketParser& parser, float gravity, tmpg::EntitiesHandler& eh,
 		tmpg::Platform& platform, tmpg::InputHandler& ih)
 	{
-		std::cout << "parsing" << std::endl;
-
 		uint16_t playerID = parser.ReadNext<uint16_t>(CHAR_DELIMITER);
 		uint64_t packet = parser.ReadNext<uint64_t>(CHAR_DELIMITER);
 		auto& client = m_addresses[playerID];
@@ -92,7 +90,13 @@ namespace net {
 			if (flags[5]) { platform.HandleAction(tmpg::SHIELD, player); }
 			if (flags[6]) { player.Move(tmpg::FALL, i.time, gravity); }
 			if (flags[7]) { eh.PushBullet(playerID); }
-			if (flags[8]) { platform.HandleAction(tmpg::START_TERRAFORMING, player); }
+			if (flags[8]) 
+			{ 
+				platform.HandleAction(tmpg::START_TERRAFORMING, player); 
+				platform.UpdateFP(player.Terraforming(), i.time);
+//				platform.UpdateMesh();
+				platform.UpdatedExternally() = true;
+			}
 			else platform.HandleAction(tmpg::END_TERRAFORMING, player);
 
 			if (flags[9])
@@ -108,7 +112,7 @@ namespace net {
 
 	void Server::UDPThread(tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph, tmpg::Platform& platform)
 	{
-		static constexpr uint32_t BUFFER_MAX_SIZE = 512;
+		static constexpr uint32_t BUFFER_MAX_SIZE = 2048;
 		for (;;)
 		{
 			Byte messageBuffer[BUFFER_MAX_SIZE];
@@ -156,6 +160,7 @@ namespace net {
 			{
 				tmpg::Player& player = eh[client->second.entityIndex];
 				uint16_t flags = Flags<uint16_t>(client->second.actions, 9u);
+				std::cout << glm::to_string(player.Position()) << " ; " << glm::to_string(player.Direction()) << std::endl;
 				encoder.PushBytes(client->first, client->second.packet, player.Position(), player.Direction(), flags);
 			}
 		}
