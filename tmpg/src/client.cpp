@@ -123,13 +123,13 @@ ih.Key(GLFW_KEY_LEFT_SHIFT),
 	void Client::ReceiveServerUpdate(tmpg::EntitiesHandler& eh, tmpg::InputHandler& ih, tmpg::physics::PhysicsHandler& ph)
 	{
 		Byte buffer[512];
-		auto pair = m_UDPSocket.ReceiveFrom(buffer, 512);
+		auto size = m_UDPSocket.Receive(buffer, 512);
 
-		if (pair.second != 0)
+		if (size != 0)
 		{
-			std::cout << pair.second << std::endl;
+			std::cout << size << std::endl;
 
-			PacketParser parser{ buffer, static_cast<uint32_t>(pair.second) };
+			PacketParser parser{ buffer, static_cast<uint32_t>(size) };
 			uint16_t clientID = parser.ReadNext<uint16_t>(CHAR_DELIMITER);
 			uint64_t packetID = parser.ReadNext<uint64_t>(CHAR_DELIMITER);
 
