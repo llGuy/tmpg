@@ -61,13 +61,11 @@ namespace net {
 		tmpg::Timer tickRateTracker;
 		tickRateTracker.Start();
 
-		bool playerUpdated = false;
-
 		for (;;)
 		{
 			tickRateTracker.Reset();
 
-
+			bool playerUpdated = ih.SequenceSize() > 0;
 
 			if (playerUpdated)
 			{
