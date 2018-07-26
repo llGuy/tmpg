@@ -76,7 +76,7 @@ namespace net {
 
 				PacketEncoder encoder;
 
-				encoder.PushBytes(CLIENT_UPDATE, m_clientID, m_packetID++);
+				encoder.PushBytes(CLIENT_UPDATE, m_clientID, m_packetID);
 				uint16_t inputSequenceSize = ih.SequenceSize();
 				encoder.PushBytes(inputSequenceSize);
 				for (uint32_t i = 0; i < inputSequenceSize; ++i) encoder.PushBytes(ih[i]);
