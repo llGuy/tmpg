@@ -117,6 +117,12 @@ namespace net {
 		auto bytes = sendto(m_socket, (const char*)data, dataSize, 0, (SOCKADDR*)&address, sizeof(address));
     }
 
+	void WinSocket::EnableNonBlockingMode(void)
+	{
+		u_long mode = 1;
+		ioctlsocket(m_socket, FIONBIO, &mode);
+	}
+
 }
 
 #endif

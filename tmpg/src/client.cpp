@@ -35,6 +35,7 @@ namespace net {
 		SocketInit initUDP{ AF_INET, SOCK_DGRAM, IPPROTO_UDP };
 		m_UDPSocket.Init(initUDP, 0, addr.c_str(), port.c_str());
 		m_UDPSocket.Connect();
+		m_UDPSocket.EnableNonBlockingMode();
 
 		m_UDPThread = std::make_unique<std::thread>([&] { UDPThread(eh, ih, ph); });
 	}
@@ -65,12 +66,11 @@ namespace net {
 		for (;;)
 		{
 			tickRateTracker.Reset();
-			bool keys[]
-			{
-			ih.Key(GLFW_KEY_W),
+			bool keys[] {
+ih.Key(GLFW_KEY_W),
 			ih.Key(GLFW_KEY_A),
-ih.Key(GLFW_KEY_S),
-ih.Key(GLFW_KEY_D),
+			ih.Key(GLFW_KEY_S),
+			ih.Key(GLFW_KEY_D),
 ih.Key(GLFW_KEY_SPACE),
 ih.Key(GLFW_KEY_C),
 ih.Key(GLFW_KEY_LEFT_SHIFT),
@@ -84,7 +84,7 @@ ih.Key(GLFW_KEY_LEFT_SHIFT),
 				std::cout << (int)playerUpdated;
 			}
 			std::cout << std::endl;
-				
+
 			playerUpdated |= ih.CursorMoved();
 
 			if (playerUpdated)
