@@ -69,11 +69,10 @@ namespace tmpg {
 
     const glm::vec2& InputHandler::CursorPosition(void)
     {
-	m_cursorMoved = false;
 	return m_currentCursorPosition;
     }
 
-    bool InputHandler::CursorMoved(void)
+    bool& InputHandler::CursorMoved(void)
     {
 	return m_cursorMoved;
     }
@@ -81,6 +80,58 @@ namespace tmpg {
 	const glm::vec2& InputHandler::CursorDifference(void)
 	{
 		return m_cursorDifference;
+	}
+
+	template<typename _Ty>
+	_Ty Flags(bool* bytes, uint32_t size)
+	{
+		_Ty flags = (_Ty)0;
+		for (uint32_t i = 0; i < size; ++i)
+		{
+			bool flag = bytes[i];
+			flags += flag << i;
+		}
+		return flags;
+	}
+
+	void InputHandler::PushInput(float elapsed)
+	{
+
+		bool keys[]
+		{
+			Key(GLFW_KEY_W),
+			Key(GLFW_KEY_A),
+			Key(GLFW_KEY_S),
+			Key(GLFW_KEY_A),
+			Key(GLFW_KEY_SPACE),
+			Key(GLFW_KEY_C),
+			Key(GLFW_KEY_LEFT_SHIFT),
+			
+			MouseButton(GLFW_MOUSE_BUTTON_1),
+			MouseButton(GLFW_MOUSE_BUTTON_2),
+
+			CursorMoved()
+		};
+
+		uint16_t flags = Flags<uint16_t>(keys, sizeof(keys) / sizeof(bool));
+
+		if(flags != 0) 
+			m_inputSequence.push_back({ flags, elapsed, m_cursorDifference });
+	}
+
+	void InputHandler::ResetInputSequence(void)
+	{
+		m_inputSequence.clear();
+	}
+
+	uint16_t InputHandler::SequenceSize(void)
+	{
+		return static_cast<uint16_t>(m_inputSequence.size());
+	}
+
+	Input& InputHandler::operator[](uint32_t i)
+	{
+		return m_inputSequence[i];
 	}
 
 }

@@ -66,45 +66,22 @@ namespace net {
 		for (;;)
 		{
 			tickRateTracker.Reset();
-			bool keys[] {
-ih.Key(GLFW_KEY_W),
-			ih.Key(GLFW_KEY_A),
-			ih.Key(GLFW_KEY_S),
-			ih.Key(GLFW_KEY_D),
-ih.Key(GLFW_KEY_SPACE),
-ih.Key(GLFW_KEY_C),
-ih.Key(GLFW_KEY_LEFT_SHIFT),
 
-			ih.MouseButton(GLFW_MOUSE_BUTTON_1),
-			ih.MouseButton(GLFW_MOUSE_BUTTON_2)
-			};
-			for (uint32_t i = 0; i < sizeof(keys) / sizeof(bool); ++i)
-			{
-				playerUpdated |= keys[i];
-				std::cout << (int)playerUpdated;
-			}
-			std::cout << std::endl;
 
-			playerUpdated |= ih.CursorMoved();
 
 			if (playerUpdated)
 			{
 
 				auto& player = eh.PlayerBoundByCamera();
-				//	    auto& direction = player.Direction();
 				auto& cursorDifference = ih.CursorDifference();
 				auto& username = player.Username();
 
-				auto flags = Flags<uint16_t>(keys, sizeof(keys) / sizeof(bool));
-				// first put username, then key flags, then direction
 				PacketEncoder encoder;
-				// need to send the type of packet
-		//	    encoder.PushBytes(CLIENT_UPDATE, m_clientID, flags, direction);
 
-				encoder.PushBytes(CLIENT_UPDATE, m_clientID, m_packetID++, flags, cursorDifference);
-
-				print(static_cast<uint32_t>(CLIENT_UPDATE), " ", m_clientID, " ", static_cast<uint32_t>(flags),
-					glm::to_string(cursorDifference), username);
+				encoder.PushBytes(CLIENT_UPDATE, m_clientID, m_packetID++);
+				uint16_t inputSequenceSize = ih.SequenceSize();
+				encoder.PushBytes(inputSequenceSize);
+				for (uint32_t i = 0; i < inputSequenceSize; ++i) encoder.PushBytes(ih[i]);
 
 				m_UDPSocket.Send(encoder.Data(), encoder.Size());
 			}
@@ -125,10 +102,8 @@ ih.Key(GLFW_KEY_LEFT_SHIFT),
 		Byte buffer[512];
 		auto size = m_UDPSocket.Receive(buffer, 512);
 
-		if (size != 0)
+		if (size > 0)
 		{
-			std::cout << size << std::endl;
-
 			PacketParser parser{ buffer, static_cast<uint32_t>(size) };
 			uint16_t clientID = parser.ReadNext<uint16_t>(CHAR_DELIMITER);
 			uint64_t packetID = parser.ReadNext<uint64_t>(CHAR_DELIMITER);

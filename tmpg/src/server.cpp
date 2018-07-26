@@ -45,10 +45,23 @@ namespace net {
 		};
 	}
 
+
+	template <typename T>
+	void ExtractFlags(T flags, T size, bool* dest)
+	{
+		for (T i = 0; i < size; ++i)
+		{
+			dest[i] = (flags >> i) & 0b00000001;
+		}
+	}
+
+
 	// need to update the state of the client
 	uint16_t Server::ParseClientUpdate(PacketParser& parser, float gravity, tmpg::EntitiesHandler& eh,
 		tmpg::Platform& platform, tmpg::InputHandler& ih)
 	{
+		std::cout << "parsing" << std::endl;
+
 		uint16_t playerID = parser.ReadNext<uint16_t>(CHAR_DELIMITER);
 		uint64_t packet = parser.ReadNext<uint64_t>(CHAR_DELIMITER);
 		auto& client = m_addresses[playerID];
@@ -56,38 +69,37 @@ namespace net {
 		client.entityIndex = playerID;
 		client.packet = packet;
 		tmpg::Player& player = eh[playerID];
-		uint16_t flags = parser.ReadNext<uint16_t>(CHAR_DELIMITER);
-		player.Direction() = tmpg::Camera::Look(player.Direction(), parser.ReadNext<glm::vec2>(CHAR_DELIMITER), 0.02f);
 
-		if (ih.Key(GLFW_KEY_P))
+		// input handling bich
+		uint16_t sequenceSize = parser.ReadNext<uint16_t>(CHAR_DELIMITER);
+		for (tmpg::Input i = parser.ReadNext<tmpg::Input>(CHAR_DELIMITER); !parser.Max(); i = parser.ReadNext<tmpg::Input>(CHAR_DELIMITER))
 		{
-			std::cout << "direction : " << glm::to_string(player.Direction()) << std::endl;
-			std::cout << "flags     : " << flags << std::endl;
-			std::cout << "client id : " << playerID << std::endl;
+			uint16_t compressed = i.flags;
+
+			bool flags[10];
+			ExtractFlags<uint16_t>(compressed, 10, flags);
+
+			int32_t movement = 4;
+
+			if (flags[0]) { player.Move(tmpg::FORWARD, i.time, gravity); --movement; }
+			if (flags[1]) { player.Move(tmpg::LEFT, i.time, gravity); --movement; }
+			if (flags[2]) { player.Move(tmpg::BACKWARD, i.time, gravity); --movement; }
+			if (flags[3]) { player.Move(tmpg::RIGHT, i.time, gravity); --movement; }
+
+			if (movement == 4) player.NeutralizeMomentum();
+
+			if (flags[4]) { player.Move(tmpg::JUMP, i.time, gravity); }
+			if (flags[5]) { platform.HandleAction(tmpg::SHIELD, player); }
+			if (flags[6]) { player.Move(tmpg::FALL, i.time, gravity); }
+			if (flags[7]) { eh.PushBullet(playerID); }
+			if (flags[8]) { platform.HandleAction(tmpg::START_TERRAFORMING, player); }
+			else platform.HandleAction(tmpg::END_TERRAFORMING, player);
+
+			if (flags[9])
+			{
+				player.Direction() = tmpg::Camera::Look(player.Direction(), i.mouseMagnitude, 0.02f);
+			}
 		}
-
-		// print the key flags
-		for (uint32_t i = 0; i < 9; ++i)
-		{
-			client.actions[i] = (flags >> i) & 0b00000001;
-		}
-
-		int32_t movement = 4;
-
-		if (client.actions[0]) { player.Move(tmpg::FORWARD, 0.03f, gravity); --movement; }
-		if (client.actions[1]) { player.Move(tmpg::LEFT, 0.03f, gravity); --movement; }
-		if (client.actions[2]) { player.Move(tmpg::BACKWARD, 0.03f, gravity); --movement; }
-		if (client.actions[3]) { player.Move(tmpg::RIGHT, 0.03f, gravity); --movement; }
-
-		if (movement == 4) player.NeutralizeMomentum();
-
-		if (client.actions[4])  player.Move(tmpg::JUMP, 0.03f, gravity);
-		if (client.actions[5])  platform.HandleAction(tmpg::SHIELD, player);
-		if (client.actions[6])  player.Move(tmpg::FALL, 0.03f, gravity);
-
-		if (client.actions[7])  eh.PushBullet(playerID);
-		if (client.actions[8])  platform.HandleAction(tmpg::START_TERRAFORMING, player);
-		else		  platform.HandleAction(tmpg::END_TERRAFORMING, player);
 
 		history.Push({ packet, player.Position(), player.Direction() });
 
@@ -102,7 +114,7 @@ namespace net {
 			Byte messageBuffer[BUFFER_MAX_SIZE];
 			auto pair = m_UDPSocket.ReceiveFrom(messageBuffer, BUFFER_MAX_SIZE);
 			// parse message
-			if (pair.second != 0)
+			if (pair.second > 0)
 			{
 				auto player = ParseUDPMessage(messageBuffer, pair.second, ph.Gravity(), eh, platform, ih);
 				auto clientData = m_addresses[player];
