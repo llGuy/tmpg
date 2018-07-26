@@ -100,6 +100,7 @@ ih.Key(GLFW_KEY_LEFT_SHIFT),
 				PacketEncoder encoder;
 				// need to send the type of packet
 		//	    encoder.PushBytes(CLIENT_UPDATE, m_clientID, flags, direction);
+
 				encoder.PushBytes(CLIENT_UPDATE, m_clientID, m_packetID++, flags, cursorDifference);
 
 				print(static_cast<uint32_t>(CLIENT_UPDATE), " ", m_clientID, " ", static_cast<uint32_t>(flags),
@@ -131,17 +132,21 @@ ih.Key(GLFW_KEY_LEFT_SHIFT),
 			PacketParser parser{ buffer, static_cast<uint32_t>(pair.second) };
 			uint16_t clientID = parser.ReadNext<uint16_t>(CHAR_DELIMITER);
 			uint64_t packetID = parser.ReadNext<uint64_t>(CHAR_DELIMITER);
-			glm::vec3 position = parser.ReadNext<glm::vec3>(CHAR_DELIMITER);
-			glm::vec3 direction = parser.ReadNext<glm::vec3>(CHAR_DELIMITER);
-			uint16_t flags = parser.ReadNext<uint16_t>(CHAR_DELIMITER);
 
-			eh.PlayerBoundByCamera().Position() = position;
-			eh.PlayerBoundByCamera().Direction() = direction;
-
-			if (ih.Key(GLFW_KEY_P))
+			if (packetID == m_packetID)
 			{
-				std::cout << glm::to_string(position) << std::endl << glm::to_string(direction) << std::endl;
-				std::cout << clientID << std::endl;
+				glm::vec3 position = parser.ReadNext<glm::vec3>(CHAR_DELIMITER);
+				glm::vec3 direction = parser.ReadNext<glm::vec3>(CHAR_DELIMITER);
+				uint16_t flags = parser.ReadNext<uint16_t>(CHAR_DELIMITER);
+
+				eh.PlayerBoundByCamera().Position() = position;
+				eh.PlayerBoundByCamera().Direction() = direction;
+
+				if (ih.Key(GLFW_KEY_P))
+				{
+					std::cout << glm::to_string(position) << std::endl << glm::to_string(direction) << std::endl;
+					std::cout << clientID << std::endl;
+				}
 			}
 		}
 	}
