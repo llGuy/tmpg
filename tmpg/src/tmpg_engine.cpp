@@ -33,7 +33,7 @@ namespace tmpg {
 		else if (choice == 's' /* for server */) m_networkHandler = new net::Server;
 		else if (choice == 'o' /* offline */) m_networkHandler = nullptr;
 	}
-
+	
 	TMPGEng::~TMPGEng(void)
 	{
 #ifdef _WIN32
@@ -63,6 +63,11 @@ namespace tmpg {
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.44902f, 0.747059f, 1.0f, 1.0f);
+		
+		if (m_networkHandler != nullptr)
+		{
+			if (m_networkHandler->Mode() == net::SERVER) glClearColor(0.0f, 0.3f, 1.0f, 1.0f);
+		}
 
 		glEnable(GL_DEPTH_TEST);
 		RenderPlatforms();
@@ -92,12 +97,14 @@ namespace tmpg {
 		float elapsed = m_timer.Elapsed();
 
 		m_entitiesHandler.UpdateEntities(m_physicsHandler.Gravity(), elapsed, m_platform);
-		if (m_networkHandler->Mode() == net::CLIENT)
+	   
+		if ((m_networkHandler != nullptr && m_networkHandler->Mode() == net::CLIENT) || m_networkHandler == nullptr)
 		{
 			m_platform.UpdateForcePoints(elapsed);
-			m_platform.UpdateProtectionPoints(elapsed, m_entitiesHandler);
 		}
 		else if (m_platform.UpdatedExternally()) m_platform.UpdateMesh();
+
+		m_platform.UpdateProtectionPoints(elapsed, m_entitiesHandler);
 
 		CheckMouseUpdates();
 		CheckKeyboardUpdates(elapsed);
@@ -299,6 +306,10 @@ namespace tmpg {
 		program.UseProgram();
 
 		glm::vec3 modelColor(0.8f, 0.4f, 0.0f);
+		if (m_networkHandler != nullptr)
+		{
+			if (m_networkHandler->Mode() == net::SERVER) modelColor = glm::vec3(0.8f, 0.0f, 0.8f);
+		}
 
 		glm::mat4 translation = glm::mat4(1.0f);
 

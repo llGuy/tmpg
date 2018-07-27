@@ -87,7 +87,10 @@ namespace net {
 			if (movement == 4) player.NeutralizeMomentum();
 
 			if (flags[4]) { player.Move(tmpg::JUMP, i.time, gravity); }
-			if (flags[5]) { platform.HandleAction(tmpg::SHIELD, player); }
+			if (flags[5]) 
+			{ 
+				platform.HandleAction(tmpg::SHIELD, player); 
+			}
 			if (flags[6]) { player.Move(tmpg::FALL, i.time, gravity); }
 			if (flags[7]) { eh.PushBullet(playerID); }
 			if (flags[8]) 
